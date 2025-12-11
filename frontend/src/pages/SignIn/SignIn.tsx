@@ -2,6 +2,8 @@ import React from 'react';
 import { Form, Input, Button, Card, Typography, message } from 'antd';
 import { UserOutlined, MailOutlined, LockOutlined } from '@ant-design/icons';
 import { useNavigate, Link } from 'react-router-dom';
+import { authService } from '../../services/authService';
+import type { RegisterCredentials } from '../../types/auth';
 
 const { Title } = Typography;
 
@@ -11,26 +13,22 @@ const SignIn: React.FC = () => {
 
   const onFinish = async (values: any) => {
     try {
-      const response = await fetch('/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: values.username,
-          email: values.email,
-          password: values.password
-        }),
-      });
+      const registerData: RegisterCredentials = {
+        username: values.username,
+        email: values.email,
+        password: values.password
+      };
 
-      if (response.ok) {
-        message.success('Registration successful! Please login.');
-        navigate('/login');
-      } else {
-        const errorText = await response.text();
-        message.error('Registration failed: ' + errorText);
-      }
-    } catch (error) {
+      await authService.register(registerData);
+      message.success('Registration successful! Please login.');
+      navigate('/login');
+    } catch (error: unknown) {
       console.error(error);
-      message.error('An error occurred');
+      if (error instanceof Error) {
+        message.error('Registration failed: ' + error.message);
+      } else {
+        message.error('An error occurred');
+      }
     }
   };
 

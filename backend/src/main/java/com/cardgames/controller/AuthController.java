@@ -1,6 +1,7 @@
 package com.cardgames.controller;
 
 import com.cardgames.model.User;
+import com.cardgames.model.exception.InvalidCredentialsException;
 import com.cardgames.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -25,20 +26,16 @@ public class AuthController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody Map<String, String> payload) {
-        try {
-            User user = userService.registerUser(
-                    payload.get("email"),
-                    payload.get("password"),
-                    payload.get("username"));
-            return ResponseEntity.ok(user);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<User> register(@RequestBody Map<String, String> payload) {
+        User user = userService.registerUser(
+                payload.get("email"),
+                payload.get("password"),
+                payload.get("username"));
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> payload, HttpServletRequest request) {
+    public ResponseEntity<User> login(@RequestBody Map<String, String> payload, HttpServletRequest request) {
         User user = userService.verifyUser(
                 payload.get("email"),
                 payload.get("password"));
@@ -60,7 +57,17 @@ public class AuthController {
 
             return ResponseEntity.ok(user);
         } else {
-            return ResponseEntity.status(401).body("Invalid credentials");
+            throw new InvalidCredentialsException("Invalid credentials");
         }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        SecurityContextHolder.clearContext();
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        return ResponseEntity.ok("Logged out successfully");
     }
 }

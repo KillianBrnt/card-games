@@ -2,32 +2,38 @@ import React from 'react';
 import { Form, Input, Button, Card, Typography, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useNavigate, Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setCredentials } from '../../store/authSlice';
+import { authService } from '../../services/authService';
+import type { LoginCredentials } from '../../types/auth';
 
 const { Title } = Typography;
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const onFinish = async (values: any) => {
+  const onFinish = async (values: LoginCredentials) => {
     try {
-      const response = await fetch('/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
-      });
+      const data = await authService.login(values);
+      message.success('Login successful!');
 
-      if (response.ok) {
-        const data = await response.json();
-        message.success('Login successful!');
-        // Ideally save user info in context/store
-        console.log('User:', data);
-        navigate('/');
+      // Store token and user data in Redux
+      if (data.token) {
+        dispatch(setCredentials({ token: data.token, user: data }));
       } else {
-        message.error('Login failed: Invalid credentials');
+        // Fallback if token is missing
+        dispatch(setCredentials({ token: '', user: data }));
       }
-    } catch (error) {
+
+      navigate('/');
+    } catch (error: unknown) {
       console.error(error);
-      message.error('An error occurred during login');
+      if (error instanceof Error) {
+        message.error(error.message || 'Login failed: Invalid credentials');
+      } else {
+        message.error('An error occurred during login');
+      }
     }
   };
 
