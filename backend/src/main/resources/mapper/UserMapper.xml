@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cardgames.mapper.UserMapper">
+
+    <resultMap id="UserResultMap" type="com.cardgames.model.User">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="email" column="email"/>
+        <result property="password" column="password"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="UserResultMap">
+        SELECT id, username, email, password FROM users
+    </select>
+
+    <select id="findById" resultMap="UserResultMap">
+        SELECT id, username, email, password FROM users WHERE id = #{id}
+    </select>
+    
+    <select id="findByEmail" resultMap="UserResultMap">
+        SELECT id, username, email, password FROM users WHERE email = #{email}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO users (username, email, password) VALUES (#{username}, #{email}, #{password})
+    </insert>
+
+</mapper>
