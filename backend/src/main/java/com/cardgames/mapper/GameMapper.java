@@ -18,4 +18,6 @@ public interface GameMapper {
     Optional<Game> findById(Long id);
 
     boolean isPlayerInGame(@Param("gameId") Long gameId, @Param("userId") Long userId);
+
+    void updateGameStatus(@Param("gameId") Long gameId, @Param("status") String status);
 }

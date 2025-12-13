@@ -55,5 +55,19 @@ export const gameService = {
         }
 
         return response.json();
+    },
+
+    startGame: async (gameId: number): Promise<void> => {
+        const response = await fetch(`/game/${gameId}/start`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || 'Failed to start game');
+        }
     }
 };

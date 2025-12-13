@@ -39,4 +39,11 @@ public class GameController {
         GameResponse response = gameService.getGameInfo(gameId, user);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/{gameId}/start")
+    public ResponseEntity<Void> startGame(@PathVariable Long gameId) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        gameService.startGame(gameId, user);
+        return ResponseEntity.ok().build();
+    }
 }

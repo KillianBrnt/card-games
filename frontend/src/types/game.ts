@@ -4,6 +4,7 @@ export interface GameResponse {
     gameId: number;
     gameCode: string;
     status: GameStatus;
+    hostUserId: number;
 }
 
 export interface CreateGameRequest {

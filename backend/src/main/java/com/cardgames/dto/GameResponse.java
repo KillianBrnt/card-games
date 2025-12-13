@@ -7,13 +7,16 @@ public class GameResponse {
     private String gameCode;
     private GameStatus status;
 
+    private Long hostUserId;
+
     public GameResponse() {
     }
 
-    public GameResponse(Long gameId, String gameCode, GameStatus status) {
+    public GameResponse(Long gameId, String gameCode, GameStatus status, Long hostUserId) {
         this.gameId = gameId;
         this.gameCode = gameCode;
         this.status = status;
+        this.hostUserId = hostUserId;
     }
 
     public Long getGameId() {
@@ -38,5 +41,13 @@ public class GameResponse {
 
     public void setStatus(GameStatus status) {
         this.status = status;
+    }
+
+    public Long getHostUserId() {
+        return hostUserId;
+    }
+
+    public void setHostUserId(Long hostUserId) {
+        this.hostUserId = hostUserId;
     }
 }

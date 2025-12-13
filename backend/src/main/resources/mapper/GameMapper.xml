@@ -42,4 +42,8 @@
         SELECT COUNT(*) > 0 FROM game_player WHERE game_id = #{gameId} AND user_id = #{userId}
     </select>
 
+    <update id="updateGameStatus">
+        UPDATE game SET status = #{status} WHERE id = #{gameId}
+    </update>
+
 </mapper>

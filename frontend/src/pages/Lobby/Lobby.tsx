@@ -1,52 +1,29 @@
-
-import React, { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Card, Typography, Spin, Button, message, Tag } from 'antd';
-import { CopyOutlined, HomeOutlined } from '@ant-design/icons';
-import { gameService } from '../../services/gameService';
-import type { GameResponse } from '../../types/game';
+import React from 'react';
+import { Card, Typography, Spin, Button, Tag, List, Avatar, Row, Col } from 'antd';
+import { CopyOutlined, HomeOutlined, UserOutlined } from '@ant-design/icons';
 import MainLayout from '../../components/MainLayout';
 import './Lobby.css';
+import ChatWindow from '../../components/Chat/ChatWindow';
+import { useLobby } from './useLobby';
 
 const { Title, Text } = Typography;
 
 const Lobby: React.FC = () => {
-    const [searchParams] = useSearchParams();
-    const gameId = searchParams.get('gameId');
-    const navigate = useNavigate();
-
-    const [game, setGame] = useState<GameResponse | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        if (!gameId) {
-            setError("No game ID provided");
-            setLoading(false);
-            return;
-        }
-
-        const fetchGameInfo = async () => {
-            try {
-                const data = await gameService.getGameInfo(Number(gameId));
-                setGame(data);
-            } catch (err: any) {
-                console.error("Failed to fetch game info:", err);
-                setError(err.message || "Failed to load lobby");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchGameInfo();
-    }, [gameId]);
-
-    const copyCode = () => {
-        if (game?.gameCode) {
-            navigator.clipboard.writeText(game.gameCode);
-            message.success('Game code copied to clipboard!');
-        }
-    };
+    const {
+        game,
+        loading,
+        error,
+        connected,
+        messages,
+        chatInput,
+        setChatInput,
+        players,
+        sendMessage,
+        handleLaunchGame,
+        copyCode,
+        user,
+        navigate
+    } = useLobby();
 
     if (loading) {
         return (
@@ -78,30 +55,78 @@ const Lobby: React.FC = () => {
 
     return (
         <MainLayout>
-            <div className="lobby-container-content">
-                <Card className="lobby-card-antd" bordered={false}>
-                    <Title level={1} style={{ marginBottom: '0.5rem' }}>Lobby</Title>
-                    <Tag color="blue" style={{ marginBottom: '2rem' }}>{game?.status}</Tag>
+            <div className="lobby-container-content" style={{ maxWidth: '1200px' }}>
+                <Row gutter={24} style={{ width: '100%' }}>
+                    {/* Left Column: Game Info & Players */}
+                    <Col xs={24} md={12}>
+                        <Card className="lobby-card-antd" bordered={false} style={{ height: '100%' }}>
+                            <Title level={1} style={{ marginBottom: '0.5rem' }}>Lobby</Title>
+                            <Tag color="blue" style={{ marginBottom: '2rem' }}>{game?.status}</Tag>
 
-                    <div style={{ marginBottom: '2rem' }}>
-                        <Text type="secondary" style={{ fontSize: '1.2rem', display: 'block' }}>
-                            GAME CODE
-                        </Text>
-                        <div className="game-code-display" onClick={copyCode} style={{ cursor: 'pointer' }}>
-                            <Title level={1} style={{ color: '#ffd700', margin: 0, letterSpacing: '5px' }}>
-                                {game?.gameCode} <CopyOutlined style={{ fontSize: '20px', verticalAlign: 'middle' }} />
-                            </Title>
-                        </div>
-                    </div>
+                            <div style={{ marginBottom: '2rem' }}>
+                                <Text type="secondary" style={{ fontSize: '1.2rem', display: 'block' }}>
+                                    GAME CODE
+                                </Text>
+                                <div className="game-code-display" onClick={copyCode} style={{ cursor: 'pointer', textAlign: 'center' }}>
+                                    <Title level={1} style={{ color: '#ffd700', margin: 0, letterSpacing: '5px' }}>
+                                        {game?.gameCode} <CopyOutlined style={{ fontSize: '20px', verticalAlign: 'middle' }} />
+                                    </Title>
+                                </div>
+                            </div>
 
-                    <div className="players-section">
-                        <Title level={3}>Players</Title>
-                        {/* Placeholder for player list - since the API doesn't return players yet, we keep waiting text */}
-                        <Text type="secondary" style={{ fontStyle: 'italic' }}>
-                            Waiting for players to join...
-                        </Text>
-                    </div>
-                </Card>
+                            <div className="players-section">
+                                <Title level={3}>Players ({players.length})</Title>
+                                <List
+                                    itemLayout="horizontal"
+                                    dataSource={players}
+                                    renderItem={(player) => (
+                                        <List.Item>
+                                            <List.Item.Meta
+                                                avatar={<Avatar icon={<UserOutlined />} style={{ backgroundColor: '#87d068' }} />}
+                                                title={player}
+                                                description={player === user?.username ? "(You)" : "Ready"}
+                                            />
+                                        </List.Item>
+                                    )}
+                                />
+                                {players.length === 0 && (
+                                    <Text type="secondary" style={{ fontStyle: 'italic' }}>
+                                        Waiting for players to join...
+                                    </Text>
+                                )}
+                            </div>
+
+                            {/* Launch Game Button - Host Only state check */}
+                            {game?.hostUserId === user?.id && (
+                                <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+                                    <Button
+                                        type="primary"
+                                        size="large"
+                                        onClick={handleLaunchGame}
+                                        style={{ width: '100%', height: '50px', fontSize: '1.2rem' }}
+                                    >
+                                        Launch Game
+                                    </Button>
+                                    <Text type="secondary" style={{ display: 'block', marginTop: '10px' }}>
+                                        Only you can start the game.
+                                    </Text>
+                                </div>
+                            )}
+                        </Card>
+                    </Col>
+
+                    {/* Right Column: Chat */}
+                    <Col xs={24} md={12}>
+                        <ChatWindow
+                            messages={messages}
+                            chatInput={chatInput}
+                            setChatInput={setChatInput}
+                            sendMessage={sendMessage}
+                            connected={connected}
+                            user={user}
+                        />
+                    </Col>
+                </Row>
             </div>
         </MainLayout>
     );
