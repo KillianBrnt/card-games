@@ -55,7 +55,7 @@ const Lobby: React.FC = () => {
 
     return (
         <MainLayout>
-            <div className="lobby-container-content" style={{ maxWidth: '1200px' }}>
+            <div className="lobby-container-content" style={{ width: '100%', maxWidth: '1400px', margin: '0 auto' }}>
                 <Row gutter={24} style={{ width: '100%' }}>
                     {/* Left Column: Game Info & Players */}
                     <Col xs={24} md={12}>
@@ -75,7 +75,7 @@ const Lobby: React.FC = () => {
                             </div>
 
                             <div className="players-section">
-                                <Title level={3}>Players ({players.length})</Title>
+                                <Title level={3}>Players: {players.length}</Title>
                                 <List
                                     itemLayout="horizontal"
                                     dataSource={players}

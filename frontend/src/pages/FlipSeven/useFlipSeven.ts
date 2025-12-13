@@ -22,7 +22,7 @@ export const useFlipSeven = () => {
         }
 
         // Ensure strictly connected to this game.
-        connect(Number(gameId));
+        connect(Number(gameId), 'FLIP_SEVEN');
         setLoading(false);
 
     }, [gameId, user, connect]);

@@ -3,6 +3,7 @@ export type GameStatus = 'WAITING' | 'PLAYING' | 'FINISHED';
 export interface GameResponse {
     gameId: number;
     gameCode: string;
+    gameType: string;
     status: GameStatus;
     hostUserId: number;
 }

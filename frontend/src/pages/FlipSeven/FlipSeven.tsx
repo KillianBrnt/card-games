@@ -26,7 +26,7 @@ const FlipSeven: React.FC = () => {
     return (
         <MainLayout>
             <div style={{ padding: '20px', height: '100vh', display: 'flex', flexDirection: 'column' }}>
-                <Title level={2} style={{ color: 'white' }}>Flip Seven - Game {gameId}</Title>
+                <Title level={2} style={{ color: 'white' }}>Flip Seven</Title>
 
                 <Row gutter={24} style={{ flex: 1 }}>
                     {/* Game Area (Top/Center) */}

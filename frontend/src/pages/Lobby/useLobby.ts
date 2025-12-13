@@ -9,6 +9,7 @@ import { useWebSocket } from '../../context/WebSocketContext';
 export const useLobby = () => {
     const [searchParams] = useSearchParams();
     const gameId = searchParams.get('gameId');
+    const gameType = searchParams.get('gameType');
     const navigate = useNavigate();
     const user = useSelector((state: any) => state.auth.user);
     const { connected, messages, players, connect, sendMessage, currentGameId } = useWebSocket();
@@ -44,9 +45,12 @@ export const useLobby = () => {
     // WebSocket Connection via Context
     useEffect(() => {
         if (gameId && user) {
-            connect(Number(gameId));
+            const type = gameType || game?.gameType;
+            if (type) {
+                connect(Number(gameId), type);
+            }
         }
-    }, [gameId, user, connect]);
+    }, [gameId, user, connect, gameType, game]);
 
     // Check for System Messages to Navigate (if context messages update)
     // Note: The context itself could handle navigation if we passed navigate to it, 
@@ -55,9 +59,15 @@ export const useLobby = () => {
     useEffect(() => {
         const lastMessage = messages[messages.length - 1];
         if (lastMessage && lastMessage.type === 'SYSTEM' && lastMessage.content === 'GAME_STARTED' && lastMessage.gameId === Number(gameId)) {
-            navigate(`/flipseven?gameId=${gameId}`);
+            const targetType = gameType || game?.gameType || 'FLIP_SEVEN';
+            if (targetType === 'FLIP_SEVEN') {
+                navigate(`/flipseven?gameId=${gameId}`);
+            } else {
+                // Future games can be added here
+                console.warn("Unknown game type:", targetType);
+            }
         }
-    }, [messages, gameId, navigate]);
+    }, [messages, gameId, navigate, gameType, game]);
 
 
     const handleSendMessage = () => {

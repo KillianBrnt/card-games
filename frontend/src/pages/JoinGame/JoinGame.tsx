@@ -25,7 +25,7 @@ const JoinGame: React.FC = () => {
         setIsLoading(true);
         try {
             const response = await gameService.joinGame(gameCode.toUpperCase());
-            navigate(`/lobby?gameId=${response.gameId}`);
+            navigate(`/lobby?gameId=${response.gameId}&gameType=${response.gameType}`);
         } catch (err: any) {
             message.error(err.message || 'Failed to join game');
         } finally {

@@ -14,7 +14,7 @@ const Home: React.FC = () => {
     setCreatingGame(true);
     try {
       const response = await gameService.createGame(gameType);
-      navigate(`/lobby?gameId=${response.gameId}`, {
+      navigate(`/lobby?gameId=${response.gameId}&gameType=${response.gameType}`, {
         state: { gameCode: response.gameCode }
       });
     } catch (error) {
@@ -30,7 +30,7 @@ const Home: React.FC = () => {
         <h1 className="main-title">Pick a game</h1>
         <Row gutter={[32, 32]} justify="center">
           <Col xs={24} sm={12} md={8} lg={6}>
-            <div className="game-card flip7-card" onClick={() => handleCreateGame('FLIP_7')}>
+            <div className="game-card flip7-card" onClick={() => handleCreateGame('FLIP_SEVEN')}>
               <div className="card-overlay"></div>
               <div className="card-content">
                 <PlayCircleOutlined className="card-icon" />

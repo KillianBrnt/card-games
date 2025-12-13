@@ -18,12 +18,13 @@ interface WebSocketContextType {
     messages: Action[];
     players: string[];
     gameState: any;
-    connect: (gameId: number) => void;
+    connect: (gameId: number, gameType: string) => void;
     disconnect: () => void;
     sendMessage: (content: string) => void;
     sendGameAction: (actionType: string, props?: any) => void;
     sendAction: (type: string, payload: any) => void;
     currentGameId: number | null;
+    currentGameType: string | null;
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
@@ -35,6 +36,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const [players, setPlayers] = useState<string[]>([]);
     const [gameState, setGameState] = useState<any>(null);
     const [currentGameId, setCurrentGameId] = useState<number | null>(null);
+    const [currentGameType, setCurrentGameType] = useState<string | null>(null);
 
     const stompClientRef = useRef<any>(null);
 
@@ -49,16 +51,17 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         }
         setConnected(false);
         setCurrentGameId(null);
+        setCurrentGameType(null);
         setMessages([]);
         setPlayers([]);
         setGameState(null);
     }, []);
 
-    const connect = useCallback((gameId: number) => {
+    const connect = useCallback((gameId: number, gameType: string) => {
         if (!user) return;
 
         // If already connected to this game, do nothing
-        if (stompClientRef.current && connected && currentGameId === gameId) {
+        if (stompClientRef.current && connected && currentGameId === gameId && currentGameType === gameType) {
             console.log("Already connected to game", gameId);
             return;
         }
@@ -76,6 +79,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             console.log('Context Connected: ' + frame);
             setConnected(true);
             setCurrentGameId(gameId);
+            setCurrentGameType(gameType);
 
             // Subscribe to Chat/Actions
             stompClient.subscribe(`/topic/lobby/${gameId}/chat`, (payload: any) => {
@@ -117,7 +121,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             });
 
             // Send Join Action
-            // Backend expects Action with payload now
             const joinAction = {
                 sender: user.username,
                 type: 'JOIN',
@@ -135,16 +138,16 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }, [user, connected, currentGameId, disconnect]);
 
     const sendAction = useCallback((type: string, payload: any) => {
-        if (stompClientRef.current && connected && currentGameId && user) {
+        if (stompClientRef.current && connected && currentGameId && currentGameType && user) {
             const action = {
                 sender: user.username,
                 payload: payload,
                 type: type,
-                gameType: 'FLIP_SEVEN' // Should be dynamic but hardcoded for this requirement
+                gameType: currentGameType
             };
             stompClientRef.current.send(`/app/action/${currentGameId}/sendMessage`, {}, JSON.stringify(action));
         }
-    }, [connected, currentGameId, user]);
+    }, [connected, currentGameId, currentGameType, user]);
 
     const sendMessage = useCallback((content: string) => {
         sendAction('CHAT', { content });
@@ -166,7 +169,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }, []);
 
     return (
-        <WebSocketContext.Provider value={{ connected, messages, players, gameState, connect, disconnect, sendMessage, sendGameAction, sendAction, currentGameId }}>
+        <WebSocketContext.Provider value={{ connected, messages, players, gameState, connect, disconnect, sendMessage, sendGameAction, sendAction, currentGameId, currentGameType }}>
             {children}
         </WebSocketContext.Provider>
     );

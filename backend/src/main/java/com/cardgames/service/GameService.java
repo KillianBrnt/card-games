@@ -54,7 +54,7 @@ public class GameService {
 
         gameMapper.insertGamePlayer(host);
 
-        return new GameResponse(game.getId(), game.getCode(), game.getStatus(), game.getHostUserId());
+        return new GameResponse(game.getId(), game.getCode(), game.getStatus(), game.getType(), game.getHostUserId());
     }
 
     @Transactional
@@ -63,7 +63,8 @@ public class GameService {
                 .orElseThrow(() -> new RuntimeException("Game not found"));
 
         if (gameMapper.isPlayerInGame(game.getId(), user.getId())) {
-            return new GameResponse(game.getId(), game.getCode(), game.getStatus(), game.getHostUserId());
+            return new GameResponse(game.getId(), game.getCode(), game.getStatus(), game.getType(),
+                    game.getHostUserId());
         }
 
         if (game.getStatus() != GameStatus.WAITING) {
@@ -79,7 +80,7 @@ public class GameService {
 
         gameMapper.insertGamePlayer(player);
 
-        return new GameResponse(game.getId(), game.getCode(), game.getStatus(), game.getHostUserId());
+        return new GameResponse(game.getId(), game.getCode(), game.getStatus(), game.getType(), game.getHostUserId());
     }
 
     public GameResponse getGameInfo(Long gameId, User user) {
@@ -90,7 +91,7 @@ public class GameService {
         Game game = gameMapper.findById(gameId)
                 .orElseThrow(() -> new RuntimeException("Game not found"));
 
-        return new GameResponse(game.getId(), game.getCode(), game.getStatus(), game.getHostUserId());
+        return new GameResponse(game.getId(), game.getCode(), game.getStatus(), game.getType(), game.getHostUserId());
     }
 
     @Transactional

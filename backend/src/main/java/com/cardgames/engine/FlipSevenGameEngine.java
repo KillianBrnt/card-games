@@ -31,35 +31,8 @@ public class FlipSevenGameEngine implements GameEngine {
         Map<String, Object> payload = action.getPayload();
         String gameAction = (String) payload.get("action");
 
-        String sender = action.getSender();
-        if (sender != null) {
-            String scoresKey = GAME_PREFIX + gameId + ":scores";
-            if (!Boolean.TRUE.equals(redisTemplate.opsForHash().hasKey(scoresKey, sender))) {
-                redisTemplate.opsForHash().put(scoresKey, sender, "0");
-            }
-        }
-
         if (Action.ActionType.SYNC_REQUEST.equals(action.getType())) {
-            // Fetch current state and send back (broadcast or user-specific? Broadcast is
-            // easier)
-            String key = GAME_PREFIX + gameId + ":counter";
-            String val = redisTemplate.opsForValue().get(key);
-            int currentCount = val != null ? Integer.parseInt(val) : 0;
-
-            // Lazy-init scores if missing
-            String scoresKey = GAME_PREFIX + gameId + ":scores";
-            if (redisTemplate.opsForHash().size(scoresKey) == 0) {
-                java.util.Set<String> players = lobbyService.getPlayers(gameId);
-                if (players != null && !players.isEmpty()) {
-                    Map<String, String> initialScores = new HashMap<>();
-                    for (String player : players) {
-                        initialScores.put(player, "0");
-                    }
-                    redisTemplate.opsForHash().putAll(scoresKey, initialScores);
-                }
-            }
-
-            broadcastGameState(gameId, currentCount);
+            handleSyncRequest(gameId);
             return;
         }
 
@@ -80,6 +53,33 @@ public class FlipSevenGameEngine implements GameEngine {
         }
 
         broadcastGameState(gameId, currentCount != null ? currentCount.intValue() : 0);
+    }
+
+    /**
+     * Handles a synchronization request by fetching the current game state
+     * (counter and scores) and broadcasting it to all players.
+     */
+    private void handleSyncRequest(Long gameId) {
+        // Fetch current state and send back (broadcast or user-specific? Broadcast is
+        // easier)
+        String key = GAME_PREFIX + gameId + ":counter";
+        String val = redisTemplate.opsForValue().get(key);
+        int currentCount = val != null ? Integer.parseInt(val) : 0;
+
+        // Lazy-init scores if missing
+        String scoresKey = GAME_PREFIX + gameId + ":scores";
+        if (redisTemplate.opsForHash().size(scoresKey) == 0) {
+            java.util.Set<String> players = lobbyService.getPlayers(gameId);
+            if (players != null && !players.isEmpty()) {
+                Map<String, String> initialScores = new HashMap<>();
+                for (String player : players) {
+                    initialScores.put(player, "0");
+                }
+                redisTemplate.opsForHash().putAll(scoresKey, initialScores);
+            }
+        }
+
+        broadcastGameState(gameId, currentCount);
     }
 
     @Override
