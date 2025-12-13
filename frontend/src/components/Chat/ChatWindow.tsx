@@ -17,9 +17,10 @@ interface ChatWindowProps {
     sendMessage: () => void;
     connected: boolean;
     user: User | null;
+    style?: React.CSSProperties;
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ messages, chatInput, setChatInput, sendMessage, connected, user }) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ messages, chatInput, setChatInput, sendMessage, connected, user, style }) => {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const { token } = theme.useToken();
 
@@ -32,7 +33,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ messages, chatInput, setChatInp
     }, [messages]);
 
     return (
-        <Card className="lobby-card-antd" bordered={false} title="Chat" style={{ height: '600px', display: 'flex', flexDirection: 'column' }} bodyStyle={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <Card className="lobby-card-antd" bordered={false} title="Chat" style={{ height: '600px', display: 'flex', flexDirection: 'column', ...style }} bodyStyle={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             <div style={{ flex: 1, overflowY: 'auto', marginBottom: '1rem', paddingRight: '10px' }}>
                 <List
                     dataSource={messages}

@@ -1,0 +1,108 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -----------------------< com.cardgames:backend >------------------------
+[INFO] Building backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.4.1:run (default-cli) > test-compile @ backend >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ backend ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 5 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ backend ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ backend ---
+[INFO] skip non existing resourceDirectory C:\Users\Killian\Documents\project\card-games\backend\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ backend ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] <<< spring-boot:3.4.1:run (default-cli) < test-compile @ backend <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.4.1:run (default-cli) @ backend ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.4.1)
+
+2025-12-13T20:28:10.502+01:00  INFO 38484 --- [backend] [           main] com.cardgames.CardGamesApplication       : Starting CardGamesApplication using Java 21.0.9 with PID 38484 (C:\Users\Killian\Documents\project\card-games\backend\target\classes started by Killian in C:\Users\Killian\Documents\project\card-games\backend)
+2025-12-13T20:28:10.504+01:00  INFO 38484 --- [backend] [           main] com.cardgames.CardGamesApplication       : No active profile set, falling back to 1 default profile: "default"
+2025-12-13T20:28:10.938+01:00  INFO 38484 --- [backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2025-12-13T20:28:10.940+01:00  INFO 38484 --- [backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2025-12-13T20:28:10.958+01:00  INFO 38484 --- [backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 7 ms. Found 0 Redis repository interfaces.
+2025-12-13T20:28:11.342+01:00  INFO 38484 --- [backend] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-12-13T20:28:11.353+01:00  INFO 38484 --- [backend] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-12-13T20:28:11.353+01:00  INFO 38484 --- [backend] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.34]
+2025-12-13T20:28:11.394+01:00  INFO 38484 --- [backend] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-12-13T20:28:11.395+01:00  INFO 38484 --- [backend] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 860 ms
+2025-12-13T20:28:11.495+01:00  INFO 38484 --- [backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-12-13T20:28:11.586+01:00  INFO 38484 --- [backend] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@487cd177
+2025-12-13T20:28:11.587+01:00  INFO 38484 --- [backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-12-13T20:28:11.670+01:00  INFO 38484 --- [backend] [           main] liquibase.database                       : Set default schema name to public
+2025-12-13T20:28:11.946+01:00  INFO 38484 --- [backend] [           main] liquibase.changelog                      : Reading from public.databasechangelog
+2025-12-13T20:28:11.979+01:00  INFO 38484 --- [backend] [           main] liquibase.ui                             : Database is up to date, no changesets to execute
+2025-12-13T20:28:11.980+01:00  INFO 38484 --- [backend] [           main] liquibase.changelog                      : Reading from public.databasechangelog
+2025-12-13T20:28:11.985+01:00  INFO 38484 --- [backend] [           main] liquibase.util                           : UPDATE SUMMARY
+2025-12-13T20:28:11.985+01:00  INFO 38484 --- [backend] [           main] liquibase.util                           : Run:                          0
+2025-12-13T20:28:11.985+01:00  INFO 38484 --- [backend] [           main] liquibase.util                           : Previously run:               2
+2025-12-13T20:28:11.985+01:00  INFO 38484 --- [backend] [           main] liquibase.util                           : Filtered out:                 0
+2025-12-13T20:28:11.985+01:00  INFO 38484 --- [backend] [           main] liquibase.util                           : -------------------------------
+2025-12-13T20:28:11.985+01:00  INFO 38484 --- [backend] [           main] liquibase.util                           : Total change sets:            2
+2025-12-13T20:28:11.986+01:00  INFO 38484 --- [backend] [           main] liquibase.util                           : Update summary generated
+2025-12-13T20:28:11.987+01:00  INFO 38484 --- [backend] [           main] liquibase.command                        : Command execution complete
+2025-12-13T20:28:12.345+01:00  WARN 38484 --- [backend] [           main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 97e02bc7-9010-4dbe-ae7d-87dcdd202e9d
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2025-12-13T20:28:12.350+01:00  INFO 38484 --- [backend] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2025-12-13T20:28:12.657+01:00  INFO 38484 --- [backend] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2025-12-13T20:28:12.657+01:00  INFO 38484 --- [backend] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@6636448b]]
+2025-12-13T20:28:12.658+01:00  INFO 38484 --- [backend] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2025-12-13T20:28:12.661+01:00  INFO 38484 --- [backend] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2025-12-13T20:28:12.661+01:00  INFO 38484 --- [backend] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@6636448b]]
+2025-12-13T20:28:12.661+01:00  INFO 38484 --- [backend] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2025-12-13T20:28:12.665+01:00  WARN 38484 --- [backend] [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2025-12-13T20:28:12.669+01:00  INFO 38484 --- [backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-12-13T20:28:12.672+01:00  INFO 38484 --- [backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-12-13T20:28:12.679+01:00  INFO 38484 --- [backend] [           main] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2025-12-13T20:28:12.689+01:00 ERROR 38484 --- [backend] [           main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8080 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8080 or configure this application to listen on another port.
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  4.324 s
+[INFO] Finished at: 2025-12-13T20:28:13+01:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:3.4.1:run (default-cli) on project backend: Process terminated with exit code: 1 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
