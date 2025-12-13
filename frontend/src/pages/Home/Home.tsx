@@ -1,84 +1,58 @@
-import React from 'react';
-import { Layout, theme, Button, Dropdown, Space, Avatar } from 'antd';
-import { UserOutlined, DownOutlined, LogoutOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
+import { Row, Col } from 'antd';
+import { PlayCircleOutlined, LoginOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import type { RootState } from '../../store';
-import { logout } from '../../store/authSlice';
-import { authService } from '../../services/authService';
-
-const { Header, Content, Footer } = Layout;
+import { gameService } from '../../services/gameService';
+import MainLayout from '../../components/MainLayout';
+import './Home.css';
 
 const Home: React.FC = () => {
-  const {
-    token: { colorBgContainer, borderRadiusLG },
-  } = theme.useToken();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.auth.user);
+  const [creatingGame, setCreatingGame] = useState(false);
 
-  const handleLogout = async () => {
+  const handleCreateGame = async (gameType: string) => {
+    setCreatingGame(true);
     try {
-      await authService.logout();
+      const response = await gameService.createGame(gameType);
+      navigate(`/lobby?gameId=${response.gameId}`, {
+        state: { gameCode: response.gameCode }
+      });
     } catch (error) {
-      console.error("Logout failed", error);
+      console.error("Failed to create game", error);
     } finally {
-      dispatch(logout());
-      navigate('/login');
+      setCreatingGame(false);
     }
   };
 
-  const userMenu = [
-    {
-      key: '1',
-      label: (
-        <div onClick={handleLogout}>
-          <Space>
-            <LogoutOutlined /> Logout
-          </Space>
-        </div>
-      ),
-    },
-  ];
-
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Header style={{ display: 'flex', alignItems: 'center' }}>
-        <div style={{ color: 'white', fontSize: 20, fontWeight: 'bold', marginRight: 40 }}>Card Games</div>
-        <div style={{ marginLeft: 'auto', marginRight: 0 }}>
-          {user ? (
-            <Dropdown menu={{ items: userMenu }}>
-              <a onClick={(e) => e.preventDefault()} style={{ color: 'white', cursor: 'pointer' }}>
-                <Space>
-                  <Avatar icon={<UserOutlined />} />
-                  {user.username}
-                  <DownOutlined />
-                </Space>
-              </a>
-            </Dropdown>
-          ) : (
-            <Button ghost onClick={() => navigate('/login')}>Login</Button>
-          )}
-        </div>
-      </Header>
-      <Content style={{ padding: '0 48px', marginTop: 24 }}>
-        <div
-          style={{
-            background: colorBgContainer,
-            minHeight: 280,
-            padding: 24,
-            borderRadius: borderRadiusLG,
-            textAlign: 'center'
-          }}
-        >
-          <h1>Welcome to the Platform</h1>
-          <p>This is the starting point of your card gaming journey.</p>
-        </div>
-      </Content>
-      <Footer style={{ textAlign: 'center' }}>
-        Card Games Platform ©{new Date().getFullYear()} Created by Killian
-      </Footer>
-    </Layout>
+    <MainLayout>
+      <div className="home-content">
+        <h1 className="main-title">Pick a game</h1>
+        <Row gutter={[32, 32]} justify="center">
+          <Col xs={24} sm={12} md={8} lg={6}>
+            <div className="game-card flip7-card" onClick={() => handleCreateGame('FLIP_7')}>
+              <div className="card-overlay"></div>
+              <div className="card-content">
+                <PlayCircleOutlined className="card-icon" />
+                <h2>FLIP 7</h2>
+                <p>Push your luck, flip the cards!</p>
+                {creatingGame && <div className="loading-spinner"></div>}
+              </div>
+            </div>
+          </Col>
+          <Col xs={24} sm={12} md={8} lg={6}>
+            <div className="game-card join-card" onClick={() => navigate('/join-game')}>
+              <div className="card-overlay"></div>
+              <div className="card-content">
+                <LoginOutlined className="card-icon" />
+                <h2>Join Game</h2>
+                <p>Enter a code to join your friends</p>
+              </div>
+            </div>
+          </Col>
+        </Row>
+      </div>
+    </MainLayout>
   );
 };
 

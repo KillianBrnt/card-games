@@ -1,0 +1,53 @@
+.join-container-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    min-height: calc(100vh - 150px);
+}
+
+.join-card-antd {
+    background: rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    width: 400px;
+}
+
+.join-card-antd .ant-card-head-title {
+    color: white;
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+.game-input-antd {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    color: white !important;
+    text-align: center;
+    font-size: 1.2rem !important;
+    letter-spacing: 2px;
+    height: 50px;
+}
+
+.game-input-antd::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.game-input-antd:focus {
+    border-color: #4ca1af !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.join-button-antd {
+    background: linear-gradient(90deg, #1CB5E0 0%, #000851 100%);
+    border: none !important;
+    height: 45px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.join-button-antd:hover:not(:disabled) {
+    background: linear-gradient(90deg, #25C6F3 0%, #00129B 100%) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(28, 181, 224, 0.4);
+}
