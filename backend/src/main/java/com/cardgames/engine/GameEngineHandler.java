@@ -14,9 +14,11 @@ public class GameEngineHandler {
     // Inject engines using constructor or setter, or let Spring collect them if we
     // implement a registry pattern.
     // simpler: inject known engines.
-    public GameEngineHandler(FlipSevenGameEngine flipSevenGameEngine, UnoGameEngine unoGameEngine) {
+    public GameEngineHandler(FlipSevenGameEngine flipSevenGameEngine, UnoGameEngine unoGameEngine,
+            SkullKingGameEngine skullKingGameEngine) {
         engines.put("FLIP_SEVEN", flipSevenGameEngine);
         engines.put("UNO", unoGameEngine);
+        engines.put("SKULL_KING", skullKingGameEngine);
     }
 
     public void handleAction(Action action) {
