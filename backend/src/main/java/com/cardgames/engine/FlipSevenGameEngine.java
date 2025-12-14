@@ -241,14 +241,10 @@ public class FlipSevenGameEngine implements GameEngine {
                 target.setLastRoundScore(0);
                 target.setRoundActive(false); // Eliminated
 
-                if (state.getFlip3DrawsRemaining() > 0) {
-                    processNextFlip3Card(state, target);
-                } else {
-                    state.setFlip3DrawsRemaining(0);
-                    state.setFlip3ActiveTarget(null);
-                    state.getPendingActionQueue().clear(); // Clear actions if busted
-                    advanceTurn(state);
-                }
+                state.setFlip3DrawsRemaining(0);
+                state.setFlip3ActiveTarget(null);
+                state.getPendingActionQueue().clear(); // Clear actions if busted
+                advanceTurn(state);
             }
         } else {
             target.setRoundScore(calculateScore(target.getHand()));
@@ -560,7 +556,7 @@ public class FlipSevenGameEngine implements GameEngine {
         }
 
         // 2. Action Cards (5 of each)
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 3; i++) {
             deck.add(new Card(idCounter++ + "", CardType.ACTION_FREEZE, 0, "Freeze"));
             deck.add(new Card(idCounter++ + "", CardType.ACTION_FLIP3, 0, "Flip 3"));
             deck.add(new Card(idCounter++ + "", CardType.ACTION_SECOND_CHANCE, 0, "Second Chance"));

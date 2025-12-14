@@ -28,9 +28,9 @@ const Home: React.FC = () => {
     <MainLayout>
       <div className="home-content">
         <h1 className="main-title">Pick a game</h1>
-        <Row gutter={[32, 32]} justify="center">
-          <Col xs={24} sm={12} md={8} lg={6}>
-            <div className="game-card flip7-card" onClick={() => handleCreateGame('FLIP_SEVEN')}>
+        <Row gutter={[32, 32]} justify="center" align="middle" style={{ alignItems: 'stretch' }}>
+          <Col xs={24} sm={12} md={8} lg={6} style={{ display: 'flex', flexDirection: 'column' }}>
+            <div className="game-card home-flip7-card" onClick={() => handleCreateGame('FLIP_SEVEN')}>
               <div className="card-overlay"></div>
               <div className="card-content">
                 <PlayCircleOutlined className="card-icon" />
@@ -40,7 +40,7 @@ const Home: React.FC = () => {
               </div>
             </div>
           </Col>
-          <Col xs={24} sm={12} md={8} lg={6}>
+          <Col xs={24} sm={12} md={8} lg={6} style={{ display: 'flex', flexDirection: 'column' }}>
             <div className="game-card join-card" onClick={() => navigate('/join-game')}>
               <div className="card-overlay"></div>
               <div className="card-content">

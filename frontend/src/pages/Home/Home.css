@@ -12,11 +12,20 @@
 }
 
 .game-card {
-    position: relative;
     height: 350px;
+    width: 100%;
+    box-sizing: border-box;
     background: white;
     border-radius: 20px;
     overflow: hidden;
+
+    /* Fix rendering */
+    border: none !important;
+    outline: none !important;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+
     cursor: pointer;
     transition: all 0.4s ease;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
@@ -71,12 +80,14 @@
 }
 
 /* Specific Card Styles */
-.flip7-card {
+.home-flip7-card {
     background: linear-gradient(45deg, #ff9966, #ff5e62);
+    border: none;
 }
 
 .join-card {
     background: linear-gradient(45deg, #4facfe, #00f2fe);
+    border: none;
 }
 
 .loading-spinner {

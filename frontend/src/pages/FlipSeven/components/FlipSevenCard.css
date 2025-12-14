@@ -1,0 +1,240 @@
+.flip7-card {
+    width: 120px;
+    height: 180px;
+    border-radius: 12px;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: inline-block;
+    overflow: hidden;
+    user-select: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background-color: white;
+    /* Default fallback */
+    font-family: 'Roboto', sans-serif;
+    /* Example modern font */
+}
+
+.flip7-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+}
+
+/* --- Card Back --- */
+.card-back {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    /* Deep Blue Gradient */
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 4px solid white;
+    box-sizing: border-box;
+}
+
+.diagonal-band {
+    position: absolute;
+    background: white;
+    width: 200%;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: rotate(-45deg);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.diagonal-text {
+    font-size: 1.5em;
+    font-weight: 900;
+    color: #FFD700;
+    /* Yellow */
+    text-shadow:
+        -1px -1px 0 #000,
+        1px -1px 0 #000,
+        -1px 1px 0 #000,
+        1px 1px 0 #000;
+    /* Cloud/Black Outline */
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* --- Card Faces General --- */
+.card-face {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    border: 4px solid white;
+}
+
+/* Common Band Style for Faces */
+.face-band-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+}
+
+.face-band {
+    background: white;
+    width: 100%;
+    padding: 5px 0;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: rotate(-10deg);
+    /* Slight jaunty angle for fun? Or straight? User said "bandeau blanc" */
+    /* Let's stick to straight for readability unless diagonal requested specific (only back specified diagonal) */
+    transform: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.face-text {
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 1.1em;
+    text-shadow:
+        -1px -1px 0 #000,
+        1px -1px 0 #000,
+        -1px 1px 0 #000,
+        1px 1px 0 #000;
+}
+
+/* --- Specific Types --- */
+
+/* Seconde Chance (Red) */
+.card-face-seconde-chance {
+    background: #ff4d4f;
+    /* Pattern: Hearts */
+    background-image: radial-gradient(rgba(255, 255, 255, 0.3) 15%, transparent 16%),
+        radial-gradient(rgba(255, 255, 255, 0.3) 15%, transparent 16%);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+}
+
+.text-seconde-chance {
+    color: #ff4d4f;
+}
+
+/* Flip 3 (Yellow) */
+.card-face-flip3 {
+    background: #FFD700;
+}
+
+.text-flip3 {
+    color: #FFD700;
+}
+
+/* Freeze (Sky Blue) */
+.card-face-freeze {
+    background: #87CEEB;
+    /* Pattern: Locks (Circles simulating locks/dots) */
+    background-image: radial-gradient(white 10%, transparent 11%);
+    background-size: 15px 15px;
+}
+
+.text-freeze {
+    color: #87CEEB;
+    /* Matches background? Or Blue? User said "Blue contour noire" */
+    color: #1890ff;
+    /* Darker blue for text inside white band */
+}
+
+/* Number Cards */
+.card-face-number {
+    background: #F5F5DC;
+    /* Beige */
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+}
+
+.number-main {
+    font-size: 4em;
+    font-weight: bold;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.number-bottom-band {
+    background: white;
+    /* "bandeau endessous"? Or bandeau inside? "nombre écrit en couleur dans un bandeau endessous" */
+    width: 100%;
+    padding: 5px;
+    text-align: center;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 1.2em;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Icon Overlays */
+.card-icon-overlay {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 1.2em;
+    opacity: 0.7;
+}
+
+.card-icon-overlay.left {
+    top: 5px;
+    left: 5px;
+    right: auto;
+}
+
+/* Animations */
+@keyframes flyFromDeck {
+    0% {
+        opacity: 0;
+        transform: scale(0.2) translate(calc(var(--dock-x) * -1), calc(var(--dock-y) * -1));
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1) translate(0, 0);
+    }
+}
+
+.card-anim-enter {
+    animation: bounceIn 0.6s cubic-bezier(0.215, 0.61, 0.355, 1.000) both;
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale3d(0.3, 0.3, 0.3);
+    }
+
+    20% {
+        transform: scale3d(1.1, 1.1, 1.1);
+    }
+
+    40% {
+        transform: scale3d(0.9, 0.9, 0.9);
+    }
+
+    60% {
+        opacity: 1;
+        transform: scale3d(1.03, 1.03, 1.03);
+    }
+
+    80% {
+        transform: scale3d(0.97, 0.97, 0.97);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale3d(1, 1, 1);
+    }
+}
