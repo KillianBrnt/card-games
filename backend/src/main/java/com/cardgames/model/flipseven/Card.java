@@ -5,6 +5,7 @@ public class Card {
     private CardType type;
     private int value; // For NUMBER and MODIFIER_PLUS
     private String name; // Display name
+    private boolean noEffect;
 
     public Card() {
     }
@@ -46,6 +47,14 @@ public class Card {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isNoEffect() {
+        return noEffect;
+    }
+
+    public void setNoEffect(boolean noEffect) {
+        this.noEffect = noEffect;
     }
 
     @Override

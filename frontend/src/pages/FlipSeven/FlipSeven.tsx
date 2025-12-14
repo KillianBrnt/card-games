@@ -4,7 +4,7 @@ import { HomeOutlined, UserOutlined, HeartFilled } from '@ant-design/icons';
 import MainLayout from '../../components/MainLayout';
 import ChatWindow from '../../components/Chat/ChatWindow';
 import { useFlipSeven } from './useFlipSeven';
-import type { FlipSevenGameState, FlipSevenPlayer } from '../../types/flipSeven';
+import type { FlipSevenGameState } from '../../types/flipSeven';
 import CardComponent from '../../components/FlipSeven/CardComponent';
 
 const { Title, Text } = Typography;
@@ -69,40 +69,44 @@ const FlipSeven: React.FC = () => {
 
                         {/* 1. Opponents Area (Top) */}
                         <div style={{ flex: '0 0 auto', display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '10px', marginBottom: '10px' }}>
-                            {game?.players.filter(p => p.username !== user?.username).map(p => (
-                                <Card
-                                    key={p.username}
-                                    size="small"
-                                    onClick={() => isSelectingTarget && handlePlayerClick(p.username)}
-                                    style={{
-                                        minWidth: 200,
-                                        background: p.roundActive ? '#fff' : '#f0f0f0',
-                                        border: game.currentPlayerIndex === game.players.indexOf(p) ? '2px solid #1890ff' : '1px solid #d9d9d9',
-                                        cursor: isSelectingTarget ? 'pointer' : 'default',
-                                        boxShadow: isSelectingTarget ? '0 0 8px #1890ff' : 'none'
-                                    }}
-                                >
-                                    <Card.Meta
-                                        avatar={<Avatar icon={<UserOutlined />} />}
-                                        title={
-                                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                <span>
-                                                    {p.username}
-                                                    {p.hasSecondChance && <HeartFilled style={{ color: 'red', marginLeft: '5px' }} />}
-                                                </span>
-                                                <Tag color="blue">{p.totalScore} pts</Tag>
+                            {game?.players.filter(p => p.username !== user?.username).map(p => {
+                                const canSelect = isSelectingTarget && p.roundActive;
+                                return (
+                                    <Card
+                                        key={p.username}
+                                        size="small"
+                                        onClick={() => canSelect && handlePlayerClick(p.username)}
+                                        style={{
+                                            minWidth: 200,
+                                            background: p.roundActive ? '#fff' : '#f0f0f0',
+                                            border: game.currentPlayerIndex === game.players.indexOf(p) ? '2px solid #1890ff' : '1px solid #d9d9d9',
+                                            cursor: canSelect ? 'pointer' : (isSelectingTarget ? 'not-allowed' : 'default'),
+                                            boxShadow: canSelect ? '0 0 8px #1890ff' : 'none',
+                                            opacity: p.roundActive ? 1 : 0.6
+                                        }}
+                                    >
+                                        <Card.Meta
+                                            avatar={<Avatar icon={<UserOutlined />} />}
+                                            title={
+                                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                    <span>
+                                                        {p.username}
+                                                        {p.hasSecondChance && <HeartFilled style={{ color: 'red', marginLeft: '5px' }} />}
+                                                    </span>
+                                                    <Tag color="blue">{p.totalScore} pts</Tag>
+                                                </div>
+                                            }
+                                            description={p.roundActive ? "In Round" : "Banked/Bust"}
+                                        />
+                                        <div style={{ marginTop: '10px' }}>
+                                            <Text strong>Current Hand ({p.roundScore} pts)</Text>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', marginTop: '5px' }}>
+                                                {p.hand.map((c, i) => <CardComponent key={c.id || i} card={c} size="small" />)}
                                             </div>
-                                        }
-                                        description={p.roundActive ? "In Round" : "Banked/Bust"}
-                                    />
-                                    <div style={{ marginTop: '10px' }}>
-                                        <Text strong>Current Hand ({p.roundScore} pts)</Text>
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', marginTop: '5px' }}>
-                                            {p.hand.map((c, i) => <CardComponent key={c.id || i} card={c} size="small" />)}
                                         </div>
-                                    </div>
-                                </Card>
-                            ))}
+                                    </Card>
+                                )
+                            })}
                         </div>
 
                         {/* 2. Center Action Area / Deck Info */}
@@ -133,10 +137,10 @@ const FlipSeven: React.FC = () => {
                                 background: 'white',
                                 borderRadius: '12px',
                                 padding: '15px',
-                                border: isSelectingTarget ? '4px solid #1890ff' : 'none',
-                                cursor: isSelectingTarget ? 'pointer' : 'default'
+                                border: (isSelectingTarget && myPlayer?.roundActive) ? '4px solid #1890ff' : 'none',
+                                cursor: (isSelectingTarget && myPlayer?.roundActive) ? 'pointer' : 'default'
                             }}
-                            onClick={() => isSelectingTarget && myPlayer && handlePlayerClick(myPlayer.username)}
+                            onClick={() => isSelectingTarget && myPlayer?.roundActive && handlePlayerClick(myPlayer.username)}
                         >
                             {myPlayer ? (
                                 <div>

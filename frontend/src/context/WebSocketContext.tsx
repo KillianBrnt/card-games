@@ -62,7 +62,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
         // If already connected to this game, do nothing
         if (stompClientRef.current && connected && currentGameId === gameId && currentGameType === gameType) {
-            console.log("Already connected to game", gameId);
+
             return;
         }
 
@@ -75,8 +75,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         const stompClient = Stomp.over(socket);
         // stompClient.debug = () => { };
 
-        stompClient.connect({}, (frame: any) => {
-            console.log('Context Connected: ' + frame);
+        stompClient.connect({}, (_frame: any) => {
+
             setConnected(true);
             setCurrentGameId(gameId);
             setCurrentGameType(gameType);
@@ -111,7 +111,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             // Subscribe to Game Updates
             stompClient.subscribe(`/topic/lobby/${gameId}/game`, (payload: any) => {
                 const gameAction = JSON.parse(payload.body);
-                console.log("Game Action Received:", gameAction);
+
                 if (gameAction.payload?.type === 'GAME_UPDATE') {
                     setGameState((prev: any) => ({
                         ...prev,

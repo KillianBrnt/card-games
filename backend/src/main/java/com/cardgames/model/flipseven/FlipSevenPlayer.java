@@ -2,15 +2,31 @@ package com.cardgames.model.flipseven;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class FlipSevenPlayer {
+    @JsonProperty("username")
     private String username;
+
+    @JsonProperty("hand")
     private List<Card> hand = new ArrayList<>(); // Cards in current round
+
+    @JsonProperty("bankedCards")
     private List<Card> bankedCards = new ArrayList<>(); // Cards banked (if we want to track them history)
+
+    @JsonProperty("roundScore")
     private int roundScore;
+
+    @JsonProperty("totalScore")
     private int totalScore;
+
+    @JsonProperty("isRoundActive")
     private boolean isRoundActive; // True if hasn't busted or stayed yet
+
+    @JsonProperty("hasSecondChance")
     private boolean hasSecondChance; // Modifier active
+
+    @JsonProperty("lastRoundScore")
     private int lastRoundScore;
 
     public FlipSevenPlayer() {

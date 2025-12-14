@@ -3,6 +3,7 @@ export interface Card {
     type: 'NUMBER' | 'ACTION_FREEZE' | 'ACTION_FLIP3' | 'ACTION_SECOND_CHANCE' | 'MODIFIER_PLUS' | 'MODIFIER_MULTIPLY';
     value: number;
     name: string;
+    noEffect?: boolean;
 }
 
 export interface FlipSevenPlayer {

@@ -37,7 +37,6 @@ public class FlipSevenGameEngine implements GameEngine {
         // 1. Get Players
         Set<String> playerNames = lobbyService.getPlayers(gameId);
         if (playerNames == null || playerNames.isEmpty()) {
-            System.out.println("No players to start game " + gameId);
             return;
         }
 
@@ -51,16 +50,15 @@ public class FlipSevenGameEngine implements GameEngine {
         // 3. Generate and Shuffle Deck
         state.setDeck(generateDeck());
 
-        // 4. Save State
+        // 6. Start First Turn (Auto-deal 1 card?)
+        // Rules say: "Chaque joueur reçoit 1 carte au début de la manche."
+        startNewRound(gameId, state);
+
+        // 4. Save State (Modified by startNewRound)
         saveState(gameId, state);
 
         // 5. Broadcast Initial State
         broadcastGameState(gameId, state);
-
-        // 6. Start First Turn (Auto-deal 1 card?)
-        // Rules say: "Chaque joueur reçoit 1 carte au début de la manche."
-        // We could implement a automated "Start Round" phase here.
-        startNewRound(gameId, state);
     }
 
     @Override
@@ -76,7 +74,9 @@ public class FlipSevenGameEngine implements GameEngine {
 
         // Allow PLAYER_READY from any player regardless of turn
         if ("PLAYER_READY".equals(type)) {
-            handlePlayerReady(state, sender);
+            handlePlayerReady(state, sender, gameId);
+            // Backup save/broadcast in case handlePlayerReady didn't trigger new round or
+            // failed
             saveState(gameId, state);
             broadcastGameState(gameId, state);
             return;
@@ -96,18 +96,26 @@ public class FlipSevenGameEngine implements GameEngine {
             }
         }
 
+        boolean stateChanged = false;
+
         if ("HIT".equals(type)) {
             handleHit(state, currentPlayer);
+            stateChanged = true;
         } else if ("STAY".equals(type)) {
             handleStay(state, currentPlayer);
+            stateChanged = true;
         } else if ("SELECT_TARGET".equals(type)) {
             handleSelectTarget(state, currentPlayer, (String) payload.get("target"));
-        } else if ("PLAYER_READY".equals(type)) {
-            handlePlayerReady(state, sender);
+            stateChanged = true;
+        } else if ("SYNC_REQUEST".equals(type)) {
+            broadcastGameState(gameId, state);
+            return;
         }
 
-        saveState(gameId, state);
-        broadcastGameState(gameId, state);
+        if (stateChanged) {
+            saveState(gameId, state);
+            broadcastGameState(gameId, state);
+        }
     }
 
     private void handleSelectTarget(FlipSevenState state, FlipSevenPlayer initiator, String targetUsername) {
@@ -121,15 +129,18 @@ public class FlipSevenGameEngine implements GameEngine {
                 .findFirst()
                 .orElse(null);
 
-        if (target == null)
+        if (target == null || !target.isRoundActive())
             return;
 
         if ("FREEZE_SELECTION".equals(state.getPendingActionType())) {
+            // Disable the action card from initiator's hand
+            disableCardByType(initiator, CardType.ACTION_FREEZE);
+
             // Freeze target breakdown
             target.setTotalScore(target.getTotalScore() + target.getRoundScore());
             target.setLastRoundScore(target.getRoundScore());
             target.setRoundActive(false);
-            target.getHand().clear();
+            // target.getHand().clear(); // Removed to show hand in modal
             target.setRoundScore(0);
 
             // Clear pending
@@ -139,6 +150,9 @@ public class FlipSevenGameEngine implements GameEngine {
             checkNextStep(state, initiator);
 
         } else if ("FLIP3_SELECTION".equals(state.getPendingActionType())) {
+            // Disable the action card from initiator's hand
+            disableCardByType(initiator, CardType.ACTION_FLIP3);
+
             // Initiate Flip 3 sequence on target
             state.setFlip3ActiveTarget(target.getUsername());
             state.setFlip3DrawsRemaining(3);
@@ -147,6 +161,39 @@ public class FlipSevenGameEngine implements GameEngine {
             state.setPendingActionInitiator(null);
 
             checkNextStep(state, target);
+
+        } else if ("GIVE_SECOND_CHANCE".equals(state.getPendingActionType())) {
+            // Initiator gives Second Chance status to target
+            // Note: The card logic is: Initator keeps card (points), but Target gets
+            // status?
+            // "il désigne un joueur pour la lui donner".
+            // Since Initiator KEEPS their own status (they already had one), the NEW status
+            // is given.
+            // The NEW status came from the newly drawn card.
+            // So Target gets Status = true.
+            // Initiator keeps their Status = true.
+            // Initiator keeps the card in hand (as points/history).
+            // But usually "Second Chance" card has no points? Value 0.
+
+            // Should the card be marked noEffect for Initiator?
+            // If it gave the status to someone else, it effectively "worked".
+            // So it's fine.
+
+            target.setHasSecondChance(true);
+
+            state.setPendingActionType(null);
+            state.setPendingActionInitiator(null);
+
+            checkNextStep(state, initiator);
+        }
+    }
+
+    private void disableCardByType(FlipSevenPlayer player, CardType type) {
+        for (Card c : player.getHand()) {
+            if (c.getType() == type && !c.isNoEffect()) {
+                c.setNoEffect(true);
+                return; // Disable only one
+            }
         }
     }
 
@@ -172,6 +219,13 @@ public class FlipSevenGameEngine implements GameEngine {
         } else if (card.getType() == CardType.ACTION_FLIP3) {
             state.getPendingActionQueue().add("FLIP3_SELECTION");
         } else if (card.getType() == CardType.ACTION_SECOND_CHANCE) {
+            if (target.isHasSecondChance()) {
+                state.setPendingActionType("GIVE_SECOND_CHANCE");
+                state.setPendingActionInitiator(target.getUsername());
+                // Break recursion to wait for action
+                target.setRoundScore(calculateScore(target.getHand()));
+                return;
+            }
             target.setHasSecondChance(true);
         }
 
@@ -179,7 +233,7 @@ public class FlipSevenGameEngine implements GameEngine {
         if (isBust(target)) {
             if (target.isHasSecondChance()) {
                 target.setHasSecondChance(false);
-                target.getHand().remove(card);
+                card.setNoEffect(true);
                 // Saved! Continue drawing remaining cards.
                 processNextFlip3Card(state, target);
             } else {
@@ -187,10 +241,14 @@ public class FlipSevenGameEngine implements GameEngine {
                 target.setLastRoundScore(0);
                 target.setRoundActive(false); // Eliminated
 
-                state.setFlip3DrawsRemaining(0);
-                state.setFlip3ActiveTarget(null);
-                state.getPendingActionQueue().clear(); // Clear actions if busted
-                advanceTurn(state);
+                if (state.getFlip3DrawsRemaining() > 0) {
+                    processNextFlip3Card(state, target);
+                } else {
+                    state.setFlip3DrawsRemaining(0);
+                    state.setFlip3ActiveTarget(null);
+                    state.getPendingActionQueue().clear(); // Clear actions if busted
+                    advanceTurn(state);
+                }
             }
         } else {
             target.setRoundScore(calculateScore(target.getHand()));
@@ -230,7 +288,7 @@ public class FlipSevenGameEngine implements GameEngine {
         advanceTurn(state);
     }
 
-    private void handlePlayerReady(FlipSevenState state, String username) {
+    private void handlePlayerReady(FlipSevenState state, String username, Long gameId) {
         if (!state.isRoundOver())
             return;
 
@@ -244,7 +302,13 @@ public class FlipSevenGameEngine implements GameEngine {
         if (state.getReadyPlayers().size() >= required) {
             state.setRoundOver(false);
             state.getReadyPlayers().clear();
-            startNewRound(null, state);
+
+            startNewRound(gameId, state);
+
+            // Force save and broadcast to ensure new round state (with dealt cards) is
+            // persisted
+            saveState(gameId, state);
+            broadcastGameState(gameId, state);
         }
     }
 
@@ -273,6 +337,12 @@ public class FlipSevenGameEngine implements GameEngine {
             player.setRoundScore(calculateScore(player.getHand()));
             return;
         } else if (card.getType() == CardType.ACTION_SECOND_CHANCE) {
+            if (player.isHasSecondChance()) {
+                state.setPendingActionType("GIVE_SECOND_CHANCE");
+                state.setPendingActionInitiator(player.getUsername());
+                player.setRoundScore(calculateScore(player.getHand()));
+                return;
+            }
             player.setHasSecondChance(true);
         }
 
@@ -282,8 +352,8 @@ public class FlipSevenGameEngine implements GameEngine {
                 // Consume second chance
                 player.setHasSecondChance(false);
                 // "ne meurt pas si doublon pourra jouer au prochain tour"
-                // Discard duplicate
-                player.getHand().remove(card);
+                // Discard duplicate -> Set noEffect
+                card.setNoEffect(true);
                 // Don't lose turn immediately? Or pass? "pourra jouer au prochain tour" -> Pass
                 // turn.
                 advanceTurn(state);
@@ -314,7 +384,8 @@ public class FlipSevenGameEngine implements GameEngine {
         player.setTotalScore(player.getTotalScore() + player.getRoundScore());
         player.setLastRoundScore(player.getRoundScore());
         player.setRoundActive(false);
-        player.getHand().clear(); // Discard hand to bank (conceptually)
+        // Do not clear hand yet, so it can be shown in Round Summary
+        // player.getHand().clear();
         player.setRoundScore(0); // Reset round score for next round display?
 
         advanceTurn(state);
@@ -345,6 +416,8 @@ public class FlipSevenGameEngine implements GameEngine {
         // automatically.
         if (player.getHand().size() == 1) {
             Card c = player.getHand().get(0);
+            if (c.isNoEffect())
+                return;
             if (c.getType() == CardType.ACTION_FREEZE) {
                 state.setPendingActionType("FREEZE_SELECTION");
                 state.setPendingActionInitiator(player.getUsername());
@@ -392,9 +465,13 @@ public class FlipSevenGameEngine implements GameEngine {
             p.setHasSecondChance(false); // Reset second chance
             p.getHand().clear();
             p.setRoundScore(0);
+            p.setLastRoundScore(0); // Reset last round score too? Or keep it for history? Usually reset for new
+                                    // round logic.
+
             if (!state.getDeck().isEmpty()) {
                 Card c = state.getDeck().remove(0);
                 p.getHand().add(c);
+
                 if (c.getType() == CardType.ACTION_SECOND_CHANCE) {
                     p.setHasSecondChance(true);
                 }
@@ -405,13 +482,19 @@ public class FlipSevenGameEngine implements GameEngine {
 
         // Check if the starting player has an actionable card immediately
         if (!state.getPlayers().isEmpty()) {
-            checkInitialHandAction(state, state.getPlayers().get(0));
+            try {
+                checkInitialHandAction(state, state.getPlayers().get(0));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
     private boolean isBust(FlipSevenPlayer player) {
         Set<Integer> numbers = new HashSet<>();
         for (Card c : player.getHand()) {
+            if (c.isNoEffect())
+                continue;
             if (c.getType() == CardType.NUMBER) {
                 if (numbers.contains(c.getValue()))
                     return true;
@@ -424,6 +507,8 @@ public class FlipSevenGameEngine implements GameEngine {
     private boolean checkFlipSeven(List<Card> hand) {
         Set<Integer> numbers = new HashSet<>();
         for (Card c : hand) {
+            if (c.isNoEffect())
+                continue;
             if (c.getType() == CardType.NUMBER) {
                 numbers.add(c.getValue());
             }
@@ -435,6 +520,8 @@ public class FlipSevenGameEngine implements GameEngine {
         int score = 0;
         int multiplier = 1;
         for (Card c : hand) {
+            if (c.isNoEffect())
+                continue;
             switch (c.getType()) {
                 case NUMBER:
                     score += c.getValue();
@@ -492,6 +579,7 @@ public class FlipSevenGameEngine implements GameEngine {
     }
 
     private void saveState(Long gameId, FlipSevenState state) {
+
         try {
             String json = objectMapper.writeValueAsString(state);
             redisTemplate.opsForValue().set(GAME_PREFIX + gameId + ":state", json);
@@ -523,6 +611,7 @@ public class FlipSevenGameEngine implements GameEngine {
         // We can send the whole state or sanitized view.
         // For MVP, sending whole state is easier, but opponents shouldn't see deck
         // order.
+
         // Sanitizing deck:
         FlipSevenState sanitized = new FlipSevenState();
         sanitized.setPlayers(state.getPlayers()); // Players see other hands? "Affichage clair des cartes en main"
@@ -535,6 +624,8 @@ public class FlipSevenGameEngine implements GameEngine {
         sanitized.setPendingActionInitiator(state.getPendingActionInitiator());
         sanitized.setRoundOver(state.isRoundOver());
         sanitized.setReadyPlayers(state.getReadyPlayers());
+        sanitized.setWinner(state.getWinner());
+        sanitized.setGameOver(state.isGameOver());
 
         payload.put("gameState", sanitized);
 

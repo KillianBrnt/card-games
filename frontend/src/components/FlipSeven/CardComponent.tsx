@@ -7,7 +7,7 @@ interface CardComponentProps {
 }
 
 const CardComponent: React.FC<CardComponentProps> = ({ card, size = 'normal' }) => {
-    const isNumber = card.type === 'NUMBER';
+
     const isAction = card.type.startsWith('ACTION');
     const isModifier = card.type.startsWith('MODIFIER');
 
@@ -43,7 +43,9 @@ const CardComponent: React.FC<CardComponentProps> = ({ card, size = 'normal' }) 
             color: textColor,
             fontWeight: 'bold',
             textAlign: 'center',
-            userSelect: 'none'
+            userSelect: 'none',
+            opacity: card.noEffect ? 0.5 : 1,
+            filter: card.noEffect ? 'grayscale(100%)' : 'none',
         }}>
             <span style={{ fontSize }}>{card.name}</span>
             {/* Optional: Add icon or suit equivalent here */}
