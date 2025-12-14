@@ -133,4 +133,14 @@ public class FlipSevenState {
     public void setGameOver(boolean gameOver) {
         isGameOver = gameOver;
     }
+
+    private int roundStarterIndex;
+
+    public int getRoundStarterIndex() {
+        return roundStarterIndex;
+    }
+
+    public void setRoundStarterIndex(int roundStarterIndex) {
+        this.roundStarterIndex = roundStarterIndex;
+    }
 }

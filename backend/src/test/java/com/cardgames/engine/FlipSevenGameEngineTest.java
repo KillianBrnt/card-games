@@ -216,6 +216,25 @@ public class FlipSevenGameEngineTest {
         assertEquals(37, testState.getPlayers().get(0).getTotalScore());
     }
 
+    @Test
+    public void testRoundRotation() throws JsonProcessingException {
+        // Setup state: Round Over, waiting for ready
+        testState.setRoundOver(true);
+        testState.setRoundStarterIndex(0); // P1 started this round
+        testState.getReadyPlayers().add("player1");
+
+        mockStateLoading();
+
+        // P2 becomes ready
+        Action action = createAction("player2", "PLAYER_READY");
+        gameEngine.handleAction(action);
+
+        // Should trigger new round
+        assertFalse(testState.isRoundOver());
+        assertEquals(1, testState.getRoundStarterIndex());
+        assertEquals(1, testState.getCurrentPlayerIndex());
+    }
+
     private void mockStateLoading() throws JsonProcessingException {
         when(valueOperations.get(anyString())).thenReturn("json_state");
         when(objectMapper.readValue("json_state", FlipSevenState.class)).thenReturn(testState);
@@ -223,12 +242,12 @@ public class FlipSevenGameEngineTest {
     }
 
     private Action createAction(String sender, String type) {
-        Action a = new Action();
-        a.setGameId(gameId);
-        a.setSender(sender);
+        Action action = new Action();
+        action.setGameId(gameId);
+        action.setSender(sender);
         Map<String, Object> p = new HashMap<>();
         p.put("action", type);
-        a.setPayload(p);
-        return a;
+        action.setPayload(p);
+        return action;
     }
 }

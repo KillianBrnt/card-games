@@ -46,6 +46,7 @@ public class FlipSevenGameEngine implements GameEngine {
         playerNames.forEach(p -> players.add(new FlipSevenPlayer(p)));
         state.setPlayers(players);
         state.setCurrentPlayerIndex(0);
+        state.setRoundStarterIndex(0);
 
         // 3. Generate and Shuffle Deck
         state.setDeck(generateDeck());
@@ -299,6 +300,10 @@ public class FlipSevenGameEngine implements GameEngine {
             state.setRoundOver(false);
             state.getReadyPlayers().clear();
 
+            // Rotate starting player
+            int nextStarter = (state.getRoundStarterIndex() + 1) % state.getPlayers().size();
+            state.setRoundStarterIndex(nextStarter);
+
             startNewRound(gameId, state);
 
             // Force save and broadcast to ensure new round state (with dealt cards) is
@@ -474,12 +479,12 @@ public class FlipSevenGameEngine implements GameEngine {
             }
             p.setRoundScore(calculateScore(p.getHand()));
         }
-        state.setCurrentPlayerIndex(0); // Rotate starting player in future?
+        state.setCurrentPlayerIndex(state.getRoundStarterIndex());
 
         // Check if the starting player has an actionable card immediately
         if (!state.getPlayers().isEmpty()) {
             try {
-                checkInitialHandAction(state, state.getPlayers().get(0));
+                checkInitialHandAction(state, state.getPlayers().get(state.getCurrentPlayerIndex()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
