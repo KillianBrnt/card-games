@@ -1,0 +1,360 @@
+/* SkullKing.css */
+
+.sk-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #000000 100%);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    font-family: sans-serif;
+}
+
+.sk-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 1rem;
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.sk-title {
+    font-size: 1.875rem;
+    /* 3xl */
+    font-weight: 800;
+    /* extrabold */
+    margin: 0;
+    background: linear-gradient(to right, #facc15, #dc2626);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.sk-round-info {
+    color: #d1d5db;
+    /* gray-300 */
+    font-size: 0.875rem;
+    /* sm */
+}
+
+.sk-phase {
+    font-size: 1.125rem;
+    /* lg */
+    font-weight: 700;
+}
+
+.sk-phase span {
+    color: #facc15;
+    /* yellow-400 */
+}
+
+.sk-winner {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ef4444;
+    /* red-500 */
+    animation: pulse 2s infinite;
+}
+
+.sk-game-board {
+    flex-grow: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.sk-opponents-area {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.sk-opponent-card {
+    background-color: #1f2937;
+    /* gray-800 */
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 8rem;
+    border: 1px solid #374151;
+    /* gray-700 */
+}
+
+.sk-opponent-name {
+    font-weight: 700;
+    width: 100%;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sk-opponent-stats {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    /* gray-400 */
+}
+
+.sk-hand-backs {
+    margin-top: 0.5rem;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.sk-card-back {
+    width: 1.5rem;
+    height: 2rem;
+    background-color: #1e3a8a;
+    /* blue-900 */
+    border: 1px solid #3b82f6;
+    /* blue-500 */
+    border-radius: 0.25rem;
+    margin-left: -0.5rem;
+    /* overlap */
+}
+
+.sk-card-back:first-child {
+    margin-left: 0;
+}
+
+.sk-trick-area {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    min-height: 200px;
+}
+
+.sk-trick-cards {
+    display: flex;
+    gap: 1rem;
+}
+
+.sk-trick-card-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.sk-player-label {
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 0 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.sk-my-control-area {
+    background-color: rgba(17, 24, 39, 0.9);
+    /* gray-900 */
+    padding: 1.5rem;
+    border-top-left-radius: 1.5rem;
+    border-top-right-radius: 1.5rem;
+    margin-top: auto;
+    box-shadow: 0 -10px 15px -3px rgba(0, 0, 0, 0.1);
+    border-top: 1px solid #374151;
+}
+
+.sk-control-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.sk-my-stats {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.sk-score {
+    color: #facc15;
+}
+
+.sk-tricks {
+    color: #93c5fd;
+    font-size: 1rem;
+}
+
+.sk-turn-indicator {
+    background-color: #16a34a;
+    /* green-600 */
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 9999px;
+    font-weight: 700;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    animation: bounce 1s infinite;
+}
+
+.sk-my-hand {
+    padding-top: 1rem;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+}
+
+.sk-hand-card-wrapper {
+    transition: transform 0.2s;
+}
+
+.sk-hand-card-wrapper:hover {
+    transform: scale(1.1);
+}
+
+/* Modals */
+.sk-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+.sk-modal-content {
+    background-color: #1f2937;
+    padding: 2rem;
+    border-radius: 0.75rem;
+    text-align: center;
+    border: 2px solid #eab308;
+    max-width: 42rem;
+    width: 100%;
+}
+
+.sk-modal-title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #eab308;
+    margin-bottom: 1.5rem;
+}
+
+.sk-round-table {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    text-align: left;
+    margin-bottom: 2rem;
+    background-color: #111827;
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+.sk-table-header {
+    font-weight: 700;
+    color: #9ca3af;
+}
+
+.sk-points-plus {
+    color: #4ade80;
+}
+
+.sk-points-minus {
+    color: #f87171;
+}
+
+.sk-btn-primary {
+    background-color: #ca8a04;
+    color: black;
+    font-weight: 700;
+    padding: 0.75rem 2rem;
+    border-radius: 9999px;
+    font-size: 1.25rem;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.sk-btn-primary:hover {
+    background-color: #eab308;
+    transform: scale(1.05);
+}
+
+/* Waiting / Empty State */
+.sk-waiting {
+    color: #6b7280;
+    font-size: 1.25rem;
+    font-style: italic;
+    opacity: 0.5;
+    border: 2px dashed #4b5563;
+    padding: 2rem;
+    border-radius: 9999px;
+}
+
+/* Animations */
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .5;
+    }
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-25%);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 20px, 0);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+.sk-trick-winner-banner {
+    position: absolute;
+    top: -3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ca8a04;
+    color: black;
+    font-weight: 800;
+    padding: 0.5rem 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    border: 2px solid white;
+    z-index: 10;
+    white-space: nowrap;
+    animation: bounce 1s infinite;
+}
+
+.sk-starter-indicator {
+    background-color: #eab308;
+    color: black;
+    font-size: 0.75rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 0.25rem;
+    margin-left: 0.5rem;
+    font-weight: 700;
+    display: inline-block;
+    vertical-align: middle;
+}

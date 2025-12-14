@@ -16,12 +16,15 @@ public class GameEngineHandlerTest {
     @Mock
     private UnoGameEngine unoGameEngine;
 
+    @Mock
+    private SkullKingGameEngine skullKingGameEngine;
+
     private GameEngineHandler gameEngineHandler;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        gameEngineHandler = new GameEngineHandler(flipSevenGameEngine, unoGameEngine);
+        gameEngineHandler = new GameEngineHandler(flipSevenGameEngine, unoGameEngine, skullKingGameEngine);
     }
 
     @Test
@@ -72,6 +75,14 @@ public class GameEngineHandlerTest {
         gameEngineHandler.initializeGame("UNO", gameId);
 
         verify(unoGameEngine, times(1)).initializeGame(gameId);
+    }
+
+    @Test
+    public void testInitializeGame_SkullKing() {
+        Long gameId = 1L;
+        gameEngineHandler.initializeGame("SKULL_KING", gameId);
+
+        verify(skullKingGameEngine, times(1)).initializeGame(gameId);
     }
 
     @Test

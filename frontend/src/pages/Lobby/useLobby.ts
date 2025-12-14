@@ -64,6 +64,19 @@ export const useLobby = () => {
                 navigate(`/flipseven?gameId=${gameId}`);
             } else if (targetType === 'UNO') {
                 navigate(`/uno?gameId=${gameId}`);
+            } else if (targetType === 'SKULL_KING') {
+                navigate(`/skullking?gameId=${gameId}`); {/* SkullKing uses simplified ID param? No, let's keep consistent layout uses query params? "useSkullKing(id)" uses useParams. Let's make SkullKing use query params. */ }
+                {/* Wait, my SkullKing.tsx uses useParams<{ id: string }>(). 
+                    line 10: const { id } = useParams<{ id: string }>();
+                    And route is path="/skullking/:id" ? 
+                    Ah, I didn't set the route yet. The snippet showed:
+                    <Route path="/flipseven" element={<FlipSeven />} /> (No id)
+                    
+                    If I use <Route path="/skullking" element={<SkullKing />} /> 
+                    then SkullKing must use useSearchParams.
+
+                    Let's check SkullKing.tsx again.
+                */}
             } else {
                 // Future games can be added here
                 console.warn("Unknown game type:", targetType);

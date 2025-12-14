@@ -52,6 +52,17 @@ const Home: React.FC = () => {
             </div>
           </Col>
           <Col xs={24} sm={12} md={8} lg={6} style={{ display: 'flex', flexDirection: 'column' }}>
+            <div className="game-card skull-king-card" onClick={() => handleCreateGame('SKULL_KING')}>
+              <div className="card-overlay"></div>
+              <div className="card-content">
+                <span className="card-icon" style={{ fontSize: '4rem' }}>🏴‍☠️</span>
+                <h2>SKULL KING</h2>
+                <p>Bid correctly or walk the plank!</p>
+                {creatingGame && <div className="loading-spinner"></div>}
+              </div>
+            </div>
+          </Col>
+          <Col xs={24} sm={12} md={8} lg={6} style={{ display: 'flex', flexDirection: 'column' }}>
             <div className="game-card join-card" onClick={() => navigate('/join-game')}>
               <div className="card-overlay"></div>
               <div className="card-content">

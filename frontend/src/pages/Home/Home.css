@@ -111,3 +111,8 @@
     /* Intense Red */
     border: none;
 }
+
+.skull-king-card {
+    background: linear-gradient(45deg, #1f1c2c, #928DAB); /* Dark Pirate Theme */
+    border: none;
+}

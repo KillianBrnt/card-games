@@ -1,0 +1,80 @@
+/* BidModal.css */
+
+.sk-bid-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 60;
+}
+
+.sk-bid-modal-content {
+    background-color: #1f2937;
+    /* gray-800 */
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    text-align: center;
+    max-width: 32rem;
+    /* lg */
+    width: 90%;
+    border: 2px solid #6366f1;
+    /* indigo-500 */
+}
+
+.sk-bid-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+}
+
+.sk-bid-subtitle {
+    color: #d1d5db;
+    /* gray-300 */
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+.sk-bid-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+.sk-bid-btn {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    font-size: 1.125rem;
+    transition: background-color 0.2s;
+    border: none;
+    cursor: pointer;
+    color: white;
+}
+
+.sk-bid-btn-normal {
+    background-color: #2563eb;
+    /* blue-600 */
+}
+
+.sk-bid-btn-normal:hover {
+    background-color: #3b82f6;
+}
+
+.sk-bid-btn-zero {
+    grid-column: span 4;
+    background-color: #9333ea;
+    /* purple-600 */
+    font-size: 1.5rem;
+}
+
+.sk-bid-btn-zero:hover {
+    background-color: #a855f7;
+}
