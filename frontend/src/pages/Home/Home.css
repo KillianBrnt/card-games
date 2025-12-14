@@ -105,3 +105,9 @@
         transform: rotate(360deg);
     }
 }
+
+.uno-card-home {
+    background: linear-gradient(45deg, #f85032, #e73827);
+    /* Intense Red */
+    border: none;
+}

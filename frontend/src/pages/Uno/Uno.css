@@ -1,0 +1,154 @@
+/* Main container within the grid column */
+.uno-game-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    padding-bottom: 20px;
+}
+
+
+.uno-opponents {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.uno-opponent {
+    text-align: center;
+    padding: 10px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    min-width: 100px;
+    position: relative;
+    border: 2px solid transparent;
+}
+
+.uno-opponent.active {
+    border-color: #ffd700;
+    box-shadow: 0 0 10px #ffd700;
+}
+
+.uno-shout {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: red;
+    color: white;
+    padding: 2px 5px;
+    border-radius: 5px;
+    font-weight: bold;
+    animation: pop 0.3s ease-out;
+}
+
+.uno-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    margin: 20px 0;
+}
+
+.uno-deck {
+    width: 6rem;
+    height: 9rem;
+    background: linear-gradient(135deg, #000 0%, #333 100%);
+    border-radius: 10px;
+    border: 3px solid white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.uno-back-card {
+    color: #ff5555;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.5rem;
+    transform: rotate(-15deg);
+}
+
+.uno-player-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.uno-hand {
+    display: flex;
+    justify-content: center;
+    gap: -20px;
+    /* Overlap */
+    margin-top: 20px;
+    padding: 20px;
+    /* overflow-x: auto; */
+    max-width: 100%;
+    flex-wrap: wrap;
+    /* Or nowrap with scroll? Wrap for now */
+}
+
+.uno-hand .uno-card {
+    margin: 0 5px;
+    transition: transform 0.2s, margin 0.2s;
+}
+
+.uno-hand .uno-card:hover {
+    transform: translateY(-20px) scale(1.1);
+    z-index: 100;
+}
+
+.my-turn {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+}
+
+.color-picker-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.color-btn {
+    height: 80px;
+    color: white;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 1.2rem;
+}
+
+.bg-RED {
+    background: #ff5555;
+}
+
+.bg-BLUE {
+    background: #5555ff;
+}
+
+.bg-GREEN {
+    background: #55aa55;
+}
+
+.bg-YELLOW {
+    background: #ffaa00;
+}
+
+@keyframes pop {
+    0% {
+        transform: scale(0);
+    }
+
+    80% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}

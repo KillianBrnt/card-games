@@ -62,6 +62,8 @@ export const useLobby = () => {
             const targetType = gameType || game?.gameType || 'FLIP_SEVEN';
             if (targetType === 'FLIP_SEVEN') {
                 navigate(`/flipseven?gameId=${gameId}`);
+            } else if (targetType === 'UNO') {
+                navigate(`/uno?gameId=${gameId}`);
             } else {
                 // Future games can be added here
                 console.warn("Unknown game type:", targetType);

@@ -13,12 +13,15 @@ public class GameEngineHandlerTest {
     @Mock
     private FlipSevenGameEngine flipSevenGameEngine;
 
+    @Mock
+    private UnoGameEngine unoGameEngine;
+
     private GameEngineHandler gameEngineHandler;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        gameEngineHandler = new GameEngineHandler(flipSevenGameEngine);
+        gameEngineHandler = new GameEngineHandler(flipSevenGameEngine, unoGameEngine);
     }
 
     @Test
@@ -29,18 +32,30 @@ public class GameEngineHandlerTest {
         gameEngineHandler.handleAction(action);
 
         verify(flipSevenGameEngine, times(1)).handleAction(action);
+        verify(unoGameEngine, never()).handleAction(action);
     }
 
     @Test
-    public void testHandleAction_UnknownType_Default() {
-        // If only one engine, it might default (based on current implementation logic)
+    public void testHandleAction_Uno() {
+        Action action = new Action();
+        action.setGameType("UNO");
+
+        gameEngineHandler.handleAction(action);
+
+        verify(unoGameEngine, times(1)).handleAction(action);
+        verify(flipSevenGameEngine, never()).handleAction(action);
+    }
+
+    @Test
+    public void testHandleAction_UnknownType_NoDefault_WhenMultipleEngines() {
+        // Since we have 2 engines now, it should NOT default to FlipSeven
         Action action = new Action();
         action.setGameType(null); // Unknown
 
         gameEngineHandler.handleAction(action);
 
-        // Implementation says: if size==1 and type==null, use default.
-        verify(flipSevenGameEngine, times(1)).handleAction(action);
+        verify(flipSevenGameEngine, never()).handleAction(action);
+        verify(unoGameEngine, never()).handleAction(action);
     }
 
     @Test
@@ -52,10 +67,19 @@ public class GameEngineHandlerTest {
     }
 
     @Test
+    public void testInitializeGame_Uno() {
+        Long gameId = 1L;
+        gameEngineHandler.initializeGame("UNO", gameId);
+
+        verify(unoGameEngine, times(1)).initializeGame(gameId);
+    }
+
+    @Test
     public void testInitializeGame_Unknown() {
         Long gameId = 1L;
         gameEngineHandler.initializeGame("POKER", gameId);
 
         verify(flipSevenGameEngine, never()).initializeGame(anyLong());
+        verify(unoGameEngine, never()).initializeGame(anyLong());
     }
 }

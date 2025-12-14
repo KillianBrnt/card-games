@@ -11,9 +11,10 @@ const { Header, Content, Footer } = Layout;
 
 interface MainLayoutProps {
     children: React.ReactNode;
+    background?: string;
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+const MainLayout: React.FC<MainLayoutProps> = ({ children, background }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const user = useSelector((state: RootState) => state.auth.user);
@@ -43,8 +44,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     ];
 
     return (
-        <Layout style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #1f1c2c, #928dab)' }}>
-            <Header style={{ display: 'flex', alignItems: 'center', background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(10px)', padding: '0 24px' }}>
+        <Layout style={{ height: '100vh', overflow: 'hidden', background: background || 'linear-gradient(135deg, #1f1c2c, #928dab)' }}>
+            <Header style={{ display: 'flex', alignItems: 'center', background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(10px)', padding: '0 24px', height: '64px', flexShrink: 0 }}>
                 <div
                     style={{ color: 'white', fontSize: 24, fontWeight: 'bold', marginRight: 40, fontFamily: 'Inter', cursor: 'pointer' }}
                     onClick={() => navigate('/')}
@@ -65,10 +66,17 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     )}
                 </div>
             </Header>
-            <Content style={{ padding: '0 24px', marginTop: 48, display: 'flex', flexDirection: 'column' }}>
+            <Content style={{
+                padding: '0 24px',
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden', // Let children handle scroll if needed
+                flex: 1
+            }}>
                 {children}
             </Content>
-            <Footer style={{ textAlign: 'center', background: 'transparent', color: 'rgba(255,255,255,0.5)' }}>
+            {/* Optional footer, maybe hide in game mode? keeping for consistency but minimizing impact */}
+            <Footer style={{ textAlign: 'center', background: 'transparent', color: 'rgba(255,255,255,0.5)', padding: '5px 50px', flexShrink: 0 }}>
                 Card Games Platform ©{new Date().getFullYear()} Created by Killian
             </Footer>
         </Layout>

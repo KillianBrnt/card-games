@@ -1,0 +1,119 @@
+.uno-card {
+    width: 6rem;
+    height: 9rem;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: bold;
+    font-family: 'Arial', sans-serif;
+    position: relative;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: transform 0.2s;
+    user-select: none;
+    background-color: white;
+    /* Fallback */
+    border: 4px solid white;
+}
+
+.uno-card:hover {
+    transform: translateY(-10px);
+    z-index: 10;
+}
+
+.uno-card.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.uno-red {
+    background: #ff5555;
+}
+
+.uno-blue {
+    background: #5555ff;
+}
+
+.uno-green {
+    background: #55aa55;
+}
+
+.uno-yellow {
+    background: #ffaa00;
+}
+
+.uno-black {
+    background: #000000;
+}
+
+.uno-card-inner {
+    width: 80%;
+    height: 80%;
+    border-radius: 50%;
+    /* Oval ish */
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: rotate(-45deg);
+    /* Classic Uno look */
+}
+
+/* For special cards, maybe generic inner shape? */
+.uno-card-value {
+    font-size: 3rem;
+    text-shadow: 2px 2px 2px black;
+    transform: rotate(45deg);
+    /* Counter act inner rotation */
+}
+
+.uno-corner-tl {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    font-size: 1rem;
+}
+
+.uno-corner-br {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    font-size: 1rem;
+    transform: rotate(180deg);
+}
+
+.uno-card.small {
+    width: 3rem;
+    height: 4.5rem;
+    font-size: 0.5rem;
+}
+
+.uno-card.small .uno-card-value {
+    font-size: 1.5rem;
+}
+
+.highlighted-interception {
+    box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.8) !important;
+    border: 2px solid gold !important;
+    animation: pulse-gold 1.5s infinite !important;
+}
+
+@keyframes pulse-gold {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+    }
+
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(255, 215, 0, 1);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+    }
+}

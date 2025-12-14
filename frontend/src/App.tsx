@@ -6,6 +6,7 @@ import Home from './pages/Home/Home';
 import JoinGame from './pages/JoinGame/JoinGame';
 import Lobby from './pages/Lobby/Lobby';
 import FlipSeven from './pages/FlipSeven/FlipSeven';
+import Uno from './pages/Uno/Uno';
 
 import { ConfigProvider } from 'antd';
 import { customTheme } from './theme/themeConfig';
@@ -23,6 +24,7 @@ const App: React.FC = () => {
             <Route path="/join-game" element={<JoinGame />} />
             <Route path="/lobby" element={<Lobby />} />
             <Route path="/flipseven" element={<FlipSeven />} />
+            <Route path="/uno" element={<Uno />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </WebSocketProvider>
