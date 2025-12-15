@@ -70,9 +70,6 @@ public class UnoGameEngineTest {
         verify(lobbyService, times(1)).getPlayers(gameId);
         // Should save state
         verify(redisTemplate.opsForValue(), times(1)).set(anyString(), anyString());
-        // Should broadcast
-        // verify(messagingTemplate, atLeastOnce()).convertAndSend(anyString(),
-        // any(Action.class));
     }
 
     @Test
@@ -103,9 +100,6 @@ public class UnoGameEngineTest {
         assertEquals(1, testState.getPlayers().get(0).getHand().size());
         // 3. Turn advanced to P2
         assertEquals(1, testState.getCurrentPlayerIndex());
-
-        // verify(messagingTemplate, atLeastOnce()).convertAndSend(anyString(),
-        // any(Action.class));
     }
 
     @Test
@@ -131,27 +125,6 @@ public class UnoGameEngineTest {
         assertEquals("1", testState.getCurrentTopCard().getId());
         assertEquals(0, testState.getCurrentPlayerIndex());
     }
-
-    /*
-     * @Test
-     * public void testProcessAction_DrawCard() throws JsonProcessingException {
-     * // Setup: Deck has card
-     * testState.setDeck(new ArrayList<>());
-     * testState.getDeck().add(new UnoCard("3", UnoCardColor.GREEN,
-     * UnoCardType.NUMBER, 1, "1"));
-     * testState.setDiscardPile(new ArrayList<>()); // redundant but safe
-     * 
-     * mockStateLoading();
-     * 
-     * Action action = createAction("player1", "DRAW_CARD");
-     * 
-     * gameEngine.handleAction(action);
-     * 
-     * // Verify P1 has 1 card
-     * assertEquals(1, testState.getPlayers().get(0).getHand().size());
-     * assertEquals("3", testState.getPlayers().get(0).getHand().get(0).getId());
-     * }
-     */
 
     @Test
     public void testProcessAction_Wild_ColorSelection() throws JsonProcessingException {
