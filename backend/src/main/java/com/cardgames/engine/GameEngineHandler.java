@@ -11,9 +11,6 @@ public class GameEngineHandler {
 
     private final Map<String, GameEngine> engines = new ConcurrentHashMap<>();
 
-    // Inject engines using constructor or setter, or let Spring collect them if we
-    // implement a registry pattern.
-    // simpler: inject known engines.
     public GameEngineHandler(FlipSevenGameEngine flipSevenGameEngine, UnoGameEngine unoGameEngine,
             SkullKingGameEngine skullKingGameEngine) {
         engines.put("FLIP_SEVEN", flipSevenGameEngine);
@@ -21,23 +18,29 @@ public class GameEngineHandler {
         engines.put("SKULL_KING", skullKingGameEngine);
     }
 
+    /**
+     * Delegates the action to the appropriate game engine based on the game type in
+     * the action.
+     *
+     * @param action The action to be handled.
+     */
     public void handleAction(Action action) {
-        // getGameType from Action. Assuming frontend sends it.
-        // If not, we might need to look it up from specific gameId, but let's assume
-        // valid action.
         String gameType = action.getGameType();
         if (gameType != null && engines.containsKey(gameType)) {
             engines.get(gameType).handleAction(action);
         } else {
-            // Default or Error handling?
-            // For now, if no type, maybe fallback to FLIP_SEVEN for dev if only one engine?
-            // Or log warning.
             if (engines.size() == 1 && gameType == null) {
                 engines.values().iterator().next().handleAction(action);
             }
         }
     }
 
+    /**
+     * Initializes a game session for a specific game type.
+     *
+     * @param gameType The type of game to initialize (e.g., FLIP_SEVEN, UNO).
+     * @param gameId   The ID of the game to initialize.
+     */
     public void initializeGame(String gameType, Long gameId) {
         if (gameType != null && engines.containsKey(gameType)) {
             engines.get(gameType).initializeGame(gameId);

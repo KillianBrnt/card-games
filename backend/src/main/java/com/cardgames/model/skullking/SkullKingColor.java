@@ -1,10 +1,36 @@
 package com.cardgames.model.skullking;
 
+/**
+ * Enumeration of the different card colors (suits) in Skull King.
+ */
 public enum SkullKingColor {
+    /**
+     * Yellow suit.
+     */
     YELLOW,
+
+    /**
+     * Purple suit.
+     */
     PURPLE,
+
+    /**
+     * Green suit.
+     */
     GREEN,
+
+    /**
+     * Red suit.
+     */
     RED,
-    BLACK, // For Black Flag (Trump)
-    NONE // For Specials like Pirate, Mermaid, Skull King, Escape
+
+    /**
+     * Black suit (Trump).
+     */
+    BLACK,
+
+    /**
+     * No specific color (for special cards).
+     */
+    NONE
 }

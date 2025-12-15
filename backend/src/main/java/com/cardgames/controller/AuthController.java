@@ -25,6 +25,13 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
+    /**
+     * Registers a new user in the system.
+     *
+     * @param payload A map containing registration details: email, password, and
+     *                username.
+     * @return A ResponseEntity containing the registered User.
+     */
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody Map<String, String> payload) {
         User user = userService.registerUser(
@@ -34,6 +41,13 @@ public class AuthController {
         return ResponseEntity.ok(user);
     }
 
+    /**
+     * Authenticates a user and establishes a security session.
+     *
+     * @param payload A map containing login credentials: email and password.
+     * @param request The HTTP request to access the session.
+     * @return A ResponseEntity containing the authenticated User.
+     */
     @PostMapping("/login")
     public ResponseEntity<User> login(@RequestBody Map<String, String> payload, HttpServletRequest request) {
         User user = userService.verifyUser(
@@ -41,17 +55,14 @@ public class AuthController {
                 payload.get("password"));
 
         if (user != null) {
-            // 1. Create Authentication Token (Roles can be added here)
             Authentication auth = new UsernamePasswordAuthenticationToken(
                     user,
                     null,
                     Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
 
-            // 2. Set Authentication in the Context
             SecurityContext sc = SecurityContextHolder.getContext();
             sc.setAuthentication(auth);
 
-            // 3. Save Context to Session (Explicitly needed for custom login endpoints)
             HttpSession session = request.getSession(true);
             session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, sc);
 
@@ -61,6 +72,12 @@ public class AuthController {
         }
     }
 
+    /**
+     * Logs out the current user and invalidates the session.
+     *
+     * @param request The HTTP request to access the session.
+     * @return A ResponseEntity containing a logout success message.
+     */
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest request) {
         SecurityContextHolder.clearContext();

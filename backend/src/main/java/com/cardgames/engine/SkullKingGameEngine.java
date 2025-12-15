@@ -29,6 +29,11 @@ public class SkullKingGameEngine implements GameEngine {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Initializes the game by setting up players, deck, and initial state.
+     *
+     * @param gameId The ID of the game to initialize.
+     */
     @Override
     public void initializeGame(Long gameId) {
         Set<String> playerNames = lobbyService.getPlayers(gameId);
@@ -51,6 +56,11 @@ public class SkullKingGameEngine implements GameEngine {
         broadcastGameState(gameId, state);
     }
 
+    /**
+     * Processes incoming actions from players, such as bids and card plays.
+     *
+     * @param action The action received from the client.
+     */
     @Override
     public void handleAction(Action action) {
         Long gameId = action.getGameId();
@@ -73,8 +83,6 @@ public class SkullKingGameEngine implements GameEngine {
         } else if ("PLAYER_READY".equals(type)) {
             stateChanged = handlePlayerReady(state, sender);
         } else if ("NEXT_ROUND".equals(type)) {
-            // Deprecated or host-force? Let's keep for fallback but main flow is
-            // PLAYER_READY
             stateChanged = startNextRound(state);
         }
 
@@ -84,6 +92,14 @@ public class SkullKingGameEngine implements GameEngine {
         }
     }
 
+    /**
+     * Updates the state with a player's bid and advances the phase if all players have bid.
+     *
+     * @param state  The current game state.
+     * @param sender The username of the player placing the bid.
+     * @param bid    The bid amount.
+     * @return true if the state changed, false otherwise.
+     */
     private boolean handleBid(SkullKingState state, String sender, int bid) {
         if (!"BIDDING".equals(state.getPhase()))
             return false;
@@ -95,14 +111,11 @@ public class SkullKingGameEngine implements GameEngine {
         if (player == null)
             return false;
 
-        // Allow re-bidding? Or lock? Usually simultaneous.
-        // Let's assume lock once bid.
         if (player.getBid() != null)
             return false;
 
         player.setBid(bid);
 
-        // Check if all bid
         if (state.getPlayers().stream().allMatch(p -> p.getBid() != null)) {
             state.setPhase("PLAYING");
             state.setCurrentPlayerIndex(state.getTrickStarterIndex());
@@ -110,6 +123,13 @@ public class SkullKingGameEngine implements GameEngine {
         return true;
     }
 
+    /**
+     * Marks a player as ready and proceeds to the next phase if all players are ready.
+     *
+     * @param state  The current game state.
+     * @param sender The username of the player.
+     * @return true if the state changed, false otherwise.
+     */
     private boolean handlePlayerReady(SkullKingState state, String sender) {
         if (!"ROUND_OVER".equals(state.getPhase()) && !"TRICK_OVER".equals(state.getPhase()))
             return false;
@@ -118,7 +138,6 @@ public class SkullKingGameEngine implements GameEngine {
             state.getReadyPlayers().add(sender);
         }
 
-        // Check if all players are ready
         long playerCount = state.getPlayers().size();
         if (state.getReadyPlayers().size() >= playerCount) {
             if ("ROUND_OVER".equals(state.getPhase())) {
@@ -130,24 +149,17 @@ public class SkullKingGameEngine implements GameEngine {
         return true;
     }
 
+    /**
+     * Prepares the state for the next trick or ends the round if hands are empty.
+     *
+     * @param state The current game state.
+     */
     private void startNextTrick(SkullKingState state) {
-        // Clear cards
         for (SkullKingPlayer p : state.getPlayers()) {
             p.setCardPlayed(null);
         }
         state.setTrickWinner(null);
         state.getReadyPlayers().clear();
-
-        // Check if Round is Over (Hand empty)
-        // We know who won the trick, they are the new starter.
-        // But we need to find who that is again or store it properly.
-        // We stored trickWinner name.
-
-        // Find winner object
-        // Actually we already updated tricksWon in resolveTrick.
-        // We need to set currentPlayerIndex to the trick winner.
-        // But wait, resolveTrick sets trickStarterIndex to winner.
-        // So currentPlayerIndex should be set to trickStarterIndex.
 
         state.setCurrentPlayerIndex(state.getTrickStarterIndex());
 
@@ -164,6 +176,14 @@ public class SkullKingGameEngine implements GameEngine {
         }
     }
 
+    /**
+     * Validates and executes a card play by a player.
+     *
+     * @param state  The current game state.
+     * @param sender The username of the player playing the card.
+     * @param cardId The ID of the card being played.
+     * @return true if the state changed, false otherwise.
+     */
     private boolean handlePlayCard(SkullKingState state, String sender, String cardId) {
         if (!"PLAYING".equals(state.getPhase()))
             return false;
@@ -181,12 +201,9 @@ public class SkullKingGameEngine implements GameEngine {
         if (!isValidMove(state, currentPlayer, card))
             return false;
 
-        // Play card
         currentPlayer.getHand().remove(card);
         currentPlayer.setCardPlayed(card);
 
-        // Advance to next player or finish trick
-        // Check if all players have played
         long playersPlayed = state.getPlayers().stream().filter(p -> p.getCardPlayed() != null).count();
         if (playersPlayed == state.getPlayers().size()) {
             resolveTrick(state);
@@ -196,12 +213,15 @@ public class SkullKingGameEngine implements GameEngine {
         return true;
     }
 
+    /**
+     * Validates if the played card follows the game rules regarding suit following and special cards.
+     *
+     * @param state  The current game state.
+     * @param player The player making the move.
+     * @param card   The card being played.
+     * @return true if the move is valid, false otherwise.
+     */
     private boolean isValidMove(SkullKingState state, SkullKingPlayer player, SkullKingCard card) {
-        // 1. Get lead color (if any)
-        // Find who started looking at trickStarterIndex?
-        // But we need to know the effective lead suit.
-        // Effective lead suit determined by the FIRST non-Escape card played.
-
         List<SkullKingPlayer> orderedPlayers = new ArrayList<>();
         int count = state.getPlayers().size();
         for (int i = 0; i < count; i++) {
@@ -210,33 +230,22 @@ public class SkullKingGameEngine implements GameEngine {
                 orderedPlayers.add(p);
             }
         }
-        // Ordered players now has the sequence of plays so far.
 
         SkullKingColor leadColor = null;
         for (SkullKingPlayer p : orderedPlayers) {
             SkullKingCard c = p.getCardPlayed();
-            // Escape doesn't set color.
-            // Colors and Black Flag set color?
-            // Actually Black Flag IS a color/suit.
             if (c.getType() == SkullKingCardType.NUMBER) {
                 leadColor = c.getColor();
                 break;
             }
-            // Specials usually don't have color to follow?
-            // If Pirate played lead, no suit logic? usually yes.
-            // If lead is special, usually no suit to follow.
         }
 
-        // If no lead color (or lead was Special), any card is valid.
         if (leadColor == null)
             return true;
 
-        // If card played is Special, it's always valid (Escapes, Pirates, SK, Mermaids)
         if (card.getType() != SkullKingCardType.NUMBER)
             return true;
 
-        // If card is NUMBER (colored or black), must follow suit IF player has it.
-        // DOES player have suit?
         SkullKingColor finalLeadColor = leadColor;
         boolean hasSuit = player.getHand().stream()
                 .anyMatch(c -> c.getType() == SkullKingCardType.NUMBER && c.getColor() == finalLeadColor);
@@ -248,8 +257,12 @@ public class SkullKingGameEngine implements GameEngine {
         return true;
     }
 
+    /**
+     * Determines the winner of the trick and updates scores.
+     *
+     * @param state The current game state.
+     */
     private void resolveTrick(SkullKingState state) {
-        // Determine winner
         List<SkullKingPlayer> trickSequence = new ArrayList<>();
         int count = state.getPlayers().size();
         for (int i = 0; i < count; i++) {
@@ -260,34 +273,28 @@ public class SkullKingGameEngine implements GameEngine {
         winner.setTricksWon(winner.getTricksWon() + 1);
         state.setTrickWinner(winner.getUsername());
 
-        // Update starter for next trick (so we know who it is later)
         int winnerIndex = state.getPlayers().indexOf(winner);
         state.setTrickStarterIndex(winnerIndex);
 
-        // Pause phase
         state.setPhase("TRICK_OVER");
         state.getReadyPlayers().clear();
     }
 
+    /**
+     * Logic to determine which card wins the trick based on Skull King rules.
+     *
+     * @param tricks The list of players in the order they played for this trick.
+     * @return The player who won the trick.
+     */
     private SkullKingPlayer determineTrickWinner(List<SkullKingPlayer> tricks) {
-        // Logic:
-        // Highest card wins.
-        // Hierarchy: SK > Mermaid > Pirate > Black Flag > Color (if matching lead) >
-        // Escape (Lose)
-
-        // Find best card
         SkullKingPlayer currentWinner = tricks.get(0);
         SkullKingCard bestCard = currentWinner.getCardPlayed();
         SkullKingColor leadColor = (bestCard.getType() == SkullKingCardType.NUMBER) ? bestCard.getColor() : null;
 
-        // If lead is Escape, lead color is determined by next card...
-        // Simplification: if first is Escape, next valid card sets leadColor.
         if (bestCard.getType() == SkullKingCardType.ESCAPE) {
-            // Find first non-escape
             for (int i = 1; i < tricks.size(); i++) {
                 SkullKingCard c = tricks.get(i).getCardPlayed();
                 if (c.getType() != SkullKingCardType.ESCAPE) {
-                    // This sets the standard?
                     if (c.getType() == SkullKingCardType.NUMBER) {
                         leadColor = c.getColor();
                     }
@@ -308,64 +315,60 @@ public class SkullKingGameEngine implements GameEngine {
         return currentWinner;
     }
 
+    /**
+     * Compares two cards to see if the challenger beats the current best card.
+     *
+     * @param challenger  The card being compared.
+     * @param currentBest The current winning card.
+     * @param leadColor   The lead color of the trick.
+     * @return true if the challenger wins, false otherwise.
+     */
     private boolean isBetter(SkullKingCard challenger, SkullKingCard currentBest, SkullKingColor leadColor) {
-        // Implement rules
-
-        // 1. Skull King
         if (challenger.getType() == SkullKingCardType.SKULL_KING)
             return true;
         if (currentBest.getType() == SkullKingCardType.SKULL_KING)
             return false;
 
-        // 2. Mermaid
-        // User rule: Mermaid beats Pirate. SK beats Mermaid. (Handled above by SK check
-        // first)
-        // If both Mermaid? Higher ID? First played usually wins in tie. Assume first
-        // played (currentBest) wins ties.
         if (challenger.getType() == SkullKingCardType.MERMAID && currentBest.getType() == SkullKingCardType.PIRATE)
             return true;
         if (challenger.getType() == SkullKingCardType.MERMAID && currentBest.getType() != SkullKingCardType.MERMAID
                 && currentBest.getType() != SkullKingCardType.SKULL_KING)
-            return true; // Mermaid beats normal stuff? Yes.
+            return true;
 
-        // 3. Pirate
         if (challenger.getType() == SkullKingCardType.PIRATE && currentBest.getType() != SkullKingCardType.SKULL_KING
                 && currentBest.getType() != SkullKingCardType.MERMAID
                 && currentBest.getType() != SkullKingCardType.PIRATE)
             return true;
 
-        // 4. Black Flag (Trump)
         if (challenger.getType() == SkullKingCardType.NUMBER && challenger.getColor() == SkullKingColor.BLACK) {
             if (currentBest.getType() == SkullKingCardType.NUMBER && currentBest.getColor() == SkullKingColor.BLACK) {
                 return challenger.getValue() > currentBest.getValue();
             }
             if (currentBest.getType() == SkullKingCardType.NUMBER && currentBest.getColor() != SkullKingColor.BLACK)
                 return true;
-            // Beats normals.
-            // Does it beat Escape? Yes.
             if (currentBest.getType() == SkullKingCardType.ESCAPE)
                 return true;
         }
 
-        // 5. Suit Color
         if (challenger.getType() == SkullKingCardType.NUMBER && challenger.getColor() == leadColor) {
             if (currentBest.getType() == SkullKingCardType.NUMBER && currentBest.getColor() == leadColor) {
                 return challenger.getValue() > currentBest.getValue();
             }
-            // Challanger followed suit, Current Best didn't (and isn't trump/special)?
-            // IF currentBest is Escape, Suit beats it.
             if (currentBest.getType() == SkullKingCardType.ESCAPE)
                 return true;
-            // If currentBest is diff color (off-suit), Suit wins.
             if (currentBest.getType() == SkullKingCardType.NUMBER && currentBest.getColor() != leadColor
                     && currentBest.getColor() != SkullKingColor.BLACK)
                 return true;
         }
 
-        // Default: Current Best stays best
         return false;
     }
 
+    /**
+     * Calculates scores for all players at the end of a round based on bids and tricks won.
+     *
+     * @param state The current game state.
+     */
     private void calculateRoundScores(SkullKingState state) {
         for (SkullKingPlayer p : state.getPlayers()) {
             int bid = p.getBid();
@@ -387,6 +390,12 @@ public class SkullKingGameEngine implements GameEngine {
         }
     }
 
+    /**
+     * Resets the state for a new round or ends the game if max rounds reached.
+     *
+     * @param state The current game state.
+     * @return true if the state changed, false otherwise.
+     */
     private boolean startNextRound(SkullKingState state) {
         if (state.getRoundNumber() >= 10) {
             determineGameWinner(state);
@@ -397,10 +406,6 @@ public class SkullKingGameEngine implements GameEngine {
         state.getReadyPlayers().clear();
         state.setDeck(generateDeck());
         state.setTrickWinner(null);
-
-        // trickStarterIndex currently holds the winner of the last trick of the
-        // previous round.
-        // We keep it as is, so that player starts the first trick of the new round.
 
         for (SkullKingPlayer p : state.getPlayers()) {
             p.getHand().clear();
@@ -413,6 +418,11 @@ public class SkullKingGameEngine implements GameEngine {
         return true;
     }
 
+    /**
+     * Identifies the winner of the game based on total scores.
+     *
+     * @param state The current game state.
+     */
     private void determineGameWinner(SkullKingState state) {
         state.setPhase("GAME_OVER");
         SkullKingPlayer winner = state.getPlayers().stream()
@@ -423,6 +433,11 @@ public class SkullKingGameEngine implements GameEngine {
         }
     }
 
+    /**
+     * Distributes cards to players for the current round.
+     *
+     * @param state The current game state.
+     */
     private void dealCards(SkullKingState state) {
         Collections.shuffle(state.getDeck());
         int cardsToDeal = state.getRoundNumber();
@@ -435,11 +450,15 @@ public class SkullKingGameEngine implements GameEngine {
         }
     }
 
+    /**
+     * Creates a standard Skull King deck with all card types.
+     *
+     * @return A list of SkullKingCards representing a new deck.
+     */
     private List<SkullKingCard> generateDeck() {
         List<SkullKingCard> deck = new ArrayList<>();
         int idCounter = 0;
 
-        // Colors
         SkullKingColor[] colors = { SkullKingColor.YELLOW, SkullKingColor.GREEN, SkullKingColor.PURPLE,
                 SkullKingColor.RED };
         for (SkullKingColor c : colors) {
@@ -447,11 +466,9 @@ public class SkullKingGameEngine implements GameEngine {
                 deck.add(new SkullKingCard(String.valueOf(idCounter++), SkullKingCardType.NUMBER, c, i));
             }
         }
-        // Black Flag (Trump)
         for (int i = 1; i <= 14; i++) {
             deck.add(new SkullKingCard(String.valueOf(idCounter++), SkullKingCardType.NUMBER, SkullKingColor.BLACK, i));
         }
-        // Specials
         for (int i = 0; i < 5; i++)
             deck.add(new SkullKingCard(String.valueOf(idCounter++), SkullKingCardType.PIRATE, SkullKingColor.NONE, 0));
         for (int i = 0; i < 2; i++)
@@ -463,6 +480,12 @@ public class SkullKingGameEngine implements GameEngine {
         return deck;
     }
 
+    /**
+     * Persists the game state to Redis.
+     *
+     * @param gameId The ID of the game.
+     * @param state  The game state to save.
+     */
     private void saveState(Long gameId, SkullKingState state) {
         try {
             String json = objectMapper.writeValueAsString(state);
@@ -472,6 +495,12 @@ public class SkullKingGameEngine implements GameEngine {
         }
     }
 
+    /**
+     * Retrieves the game state from Redis.
+     *
+     * @param gameId The ID of the game.
+     * @return The current SkullKingState, or null if not found.
+     */
     private SkullKingState loadState(Long gameId) {
         String json = redisTemplate.opsForValue().get(GAME_PREFIX + gameId + ":state");
         if (json == null)
@@ -484,6 +513,12 @@ public class SkullKingGameEngine implements GameEngine {
         }
     }
 
+    /**
+     * Sends the current game state to all clients via WebSocket.
+     *
+     * @param gameId The ID of the game.
+     * @param state  The game state to broadcast.
+     */
     private void broadcastGameState(Long gameId, SkullKingState state) {
         Action updateAction = new Action();
         updateAction.setType(Action.ActionType.GAME_ACTION);
@@ -492,7 +527,6 @@ public class SkullKingGameEngine implements GameEngine {
 
         Map<String, Object> payload = new HashMap<>();
         payload.put("type", "GAME_UPDATE");
-        // Hide deck in payload if needed
         payload.put("gameState", state);
 
         updateAction.setPayload(payload);

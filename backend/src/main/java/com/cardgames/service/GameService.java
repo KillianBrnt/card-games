@@ -32,6 +32,13 @@ public class GameService {
         this.gameEngineHandler = gameEngineHandler;
     }
 
+    /**
+     * Creates a new game instance for the user.
+     *
+     * @param gameType The type of game to create.
+     * @param user     The user creating the game.
+     * @return A response containing the created game's details.
+     */
     @Transactional
     public GameResponse createGame(String gameType, User user) {
         String code = generateGameCode();
@@ -57,6 +64,13 @@ public class GameService {
         return new GameResponse(game.getId(), game.getCode(), game.getStatus(), game.getType(), game.getHostUserId());
     }
 
+    /**
+     * Allows a user to join an existing game using its code.
+     *
+     * @param gameCode The code of the game to join.
+     * @param user     The user joining the game.
+     * @return A response containing the joined game's details.
+     */
     @Transactional
     public GameResponse joinGame(String gameCode, User user) {
         Game game = gameMapper.findByCode(gameCode)
@@ -83,6 +97,13 @@ public class GameService {
         return new GameResponse(game.getId(), game.getCode(), game.getStatus(), game.getType(), game.getHostUserId());
     }
 
+    /**
+     * Retrieves information about a specific game.
+     *
+     * @param gameId The ID of the game.
+     * @param user   The user requesting the information.
+     * @return A response containing the game's details.
+     */
     public GameResponse getGameInfo(Long gameId, User user) {
         if (!gameMapper.isPlayerInGame(gameId, user.getId())) {
             throw new AccessDeniedException("You are not part of this game");
@@ -94,6 +115,12 @@ public class GameService {
         return new GameResponse(game.getId(), game.getCode(), game.getStatus(), game.getType(), game.getHostUserId());
     }
 
+    /**
+     * Starts the game, changing its status and initializing the game engine.
+     *
+     * @param gameId The ID of the game to start.
+     * @param user   The user attempting to start the game (must be the host).
+     */
     @Transactional
     public void startGame(Long gameId, User user) {
         Game game = gameMapper.findById(gameId)
@@ -109,10 +136,8 @@ public class GameService {
 
         gameMapper.updateGameStatus(gameId, GameStatus.PLAYING.name());
 
-        // Initialize Game Engine
         gameEngineHandler.initializeGame(game.getType(), gameId);
 
-        // Broadcast System Message
         Action systemAction = new Action();
         systemAction.setType(Action.ActionType.SYSTEM);
         Map<String, Object> payload = new HashMap<>();
@@ -124,6 +149,11 @@ public class GameService {
         messagingTemplate.convertAndSend("/topic/lobby/" + gameId + "/chat", systemAction);
     }
 
+    /**
+     * Generates a random alphanumeric code for the game.
+     *
+     * @return A 6-character unique game code.
+     */
     private String generateGameCode() {
         return UUID.randomUUID().toString().substring(0, 6).toUpperCase();
     }
